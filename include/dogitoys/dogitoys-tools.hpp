@@ -43,16 +43,6 @@ inline string gff3_str_escape(const string &input) {
   return message.str();
 }
 
-inline string gff3_str_clean(string input) {
-  size_t pos = input.find('%');
-  while (pos != string::npos) {
-    auto ele = char(stoi(input.substr(pos + 1, 2), nullptr, 16));
-    input.replace(pos, 3, 1, ele);
-    pos = input.find('%', pos + 1);
-  }
-  return input;
-}
-
 inline QString gff3_str_clean(QString input) {
   int pos = input.indexOf('%');
   while (pos != -1) {
