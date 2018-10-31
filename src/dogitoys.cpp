@@ -260,26 +260,26 @@ void DOGI::init() {
 }
 
 void DOGI::open(const QString &path, bool replace) {
-  if (this->isOpen())
-    throw runtime_error("DOGI is already connected.\n"
-                        "Close current connection, before opening a new one.");
+//  if (this->isOpen())
+//    throw runtime_error("DOGI is already connected.\n"
+//                        "Close current connection, before opening a new one.");
 
-  this->db_file.setFileName(path);
-  if (replace)
-    db_file.remove();
+//  this->db_file.setFileName(path);
+//  if (replace)
+//    db_file.remove();
 
-  db_file_info.setFile(db_file);
+//  db_file_info.setFile(db_file);
 
-  name = "DOGI@" + this->db_file_info.absoluteFilePath();
+//  name = "DOGI@" + this->db_file_info.absoluteFilePath();
 
-  db = make_unique<QSqlDatabase>(QSqlDatabase::addDatabase(driver, name));
-  db->setDatabaseName(db_file_info.absoluteFilePath());
-  logger = spdlog::stdout_color_mt(name.toStdString());
+//  db = make_unique<QSqlDatabase>(QSqlDatabase::addDatabase(driver, name));
+//  db->setDatabaseName(db_file_info.absoluteFilePath());
+//  logger = spdlog::stdout_color_mt(name.toStdString());
 
-  if (!db->open())
-    throw runtime_error(
-        "Could not connect to '" + db_file_info.path().toStdString() +
-        "'\nQSqlError: " + db->lastError().text().toStdString());
+//  if (!db->open())
+//    throw runtime_error(
+//        "Could not connect to '" + db_file_info.path().toStdString() +
+//        "'\nQSqlError: " + db->lastError().text().toStdString());
 
   try {
     open_sqlite();

@@ -17,8 +17,8 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Sql REQUIRED)
 
 add_library(DOGIToys SHARED
-${CMAKE_CURRENT_SOURCE_DIR}/src/dogitoys.cpp 
-${CMAKE_CURRENT_SOURCE_DIR}/src/dogitoys-populate.cpp)
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/connect.cpp)
 
 target_include_directories(DOGIToys
     PRIVATE
@@ -32,6 +32,18 @@ target_compile_features(DOGIToys PRIVATE cxx_std_17)
 target_link_libraries(DOGIToys Qt5::Core Qt5::Sql)
 
 add_subdirectory(hkl/agizmo/pybind11)
+pybind11_add_module(pyDOGIToys ${CMAKE_CURRENT_SOURCE_DIR}/src/pydogitoys.cpp)
+target_include_directories(pyDOGIToys
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(pyDOGIToys PRIVATE DOGIToys)
 
 install(TARGETS DOGIToys LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY include/dogitoys DESTINATION ${HEADER_INSTALL_PREFIX}/include)
+
+SET(ENV{PYTHONPATH} "${CMAKE_CURRENT_BINARY_DIR}:$ENV{PYTHONPATH}")
+add_custom_command(TARGET pyDOGIToys POST_BUILD
+    COMMAND "python3" "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+

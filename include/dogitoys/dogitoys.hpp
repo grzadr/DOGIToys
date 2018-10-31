@@ -37,26 +37,29 @@ using runerror = std::runtime_error;
 namespace DOGIToys {
 
 class DOGI {
-private:
+ private:
   // Database handler
   unique_ptr<QSqlDatabase> db{nullptr};
 
   QString name{};
   inline static const QString driver{"QSQLITE"};
   QFile db_file{};
-  QFileInfo db_file_info{};
+  //  QFileInfo db_file_info{};
   int taxon_id{0};
   QString taxon_name{};
 
-  inline const static QStringList sqlite_opening{"PRAGMA encoding = 'UTF-8';",
-                                                 "PRAGMA foreign_keys = 1;"};
+  //  inline const static QStringList sqlite_opening{"PRAGMA encoding =
+  //  'UTF-8';",
+  //                                                 "PRAGMA foreign_keys =
+  //                                                 1;"};
 
-  inline const static QStringList sqlite_closing_soft{
-      "PRAGMA foreign_key_check;", "PRAGMA integrity_check;"};
+  //  inline const static QStringList sqlite_closing_soft{
+  //      "PRAGMA foreign_key_check;", "PRAGMA integrity_check;"};
 
-  inline const static QStringList sqlite_closing{"PRAGMA foreign_key_check;",
-                                                 "PRAGMA integrity_check;",
-                                                 "PRAGMA optimize;"};
+  //  inline const static QStringList sqlite_closing{"PRAGMA
+  //  foreign_key_check;",
+  //                                                 "PRAGMA integrity_check;",
+  //                                                 "PRAGMA optimize;"};
 
   void prepare(QSqlQuery &query, const QString &command) {
     DOGITools::prepare(query, command);
@@ -189,40 +192,11 @@ private:
                           int id_go);
 
   void close_sqlite(bool soft = false) {
-    if (!soft)
-      exec(sqlite_closing);
+    if (!soft) exec(sqlite_closing);
   }
   void open_sqlite() { this->exec(sqlite_opening); }
 
-public:
-  void transaction() {
-    if (!this->db->transaction())
-      throw runtime_error("New transaction failed:\n" + this->lastError());
-  }
-
-  void commit() {
-    if (!this->db->commit())
-      throw runtime_error("Commiting failed:\n" + this->lastError());
-  }
-
-  void rollback(bool force = false) {
-    if (!this->db->rollback() and !force)
-      throw runtime_error("Rollback failed:\n" + this->lastError());
-  }
-
-  void vacuum() { exec("VACUUM"); }
-
-  DOGI() = default;
-  DOGI(const QString &path, const QString &config = "") : DOGI() {
-    open(path, config);
-  }
-  DOGI(const string &path, const string &config = "") : DOGI() {
-    open(path, config);
-  }
-  DOGI(const char *path, const char *config = "") : DOGI() {
-    open(path, config);
-  }
-
+ public:
   void open(const QString &path, const QString &config) {
     if (!config.isEmpty()) {
       open(path, true);
@@ -323,7 +297,7 @@ public:
 
   string lastError() { return this->db->lastError().text().toStdString(); }
 
-  bool isOpen() { return this->db != nullptr && this->db->isOpen(); }
+  //  bool isOpen() { return this->db != nullptr && this->db->isOpen(); }
 };
 
-} // namespace DOGIToys
+}  // namespace DOGIToys
