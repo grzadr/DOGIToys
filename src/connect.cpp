@@ -34,5 +34,5 @@ void DOGI::open(const QString &path, bool create) {
 
   if (!db->open())
     throw_runerror("Could not connect to '" + path +
-                   "'\nQSqlError: " + db->lastError().text());
+                   "'\nQSqlError: " + this->lastErrorText());
 }

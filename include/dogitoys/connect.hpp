@@ -65,20 +65,21 @@ class DOGI {
 
   bool isOpen() { return this->db != nullptr && this->db->isOpen(); }
   QSqlError lastError() { return this->db->lastError(); }
+  QString lastErrorText() { return this->db->lastError().text(); }
 
   void transaction() {
     if (!this->db->transaction())
-      throw_runerror("New transaction failed:\n" + this->lastError().text());
+      throw_runerror("New transaction failed:\n" + this->lastErrorText());
   }
 
   void commit() {
     if (!this->db->commit())
-      throw_runerror("Commiting failed:\n" + this->lastError().text());
+      throw_runerror("Commiting failed:\n" + this->lastErrorText());
   }
 
   void rollback(bool force = false) {
     if (!this->db->rollback() and !force)
-      throw_runerror("Rollback failed:\n" + this->lastError().text());
+      throw_runerror("Rollback failed:\n" + this->lastErrorText());
   }
 
   QSqlQuery prepare(const QString &query) {

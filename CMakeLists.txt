@@ -17,7 +17,6 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Sql REQUIRED)
 
 add_library(DOGIToys SHARED
-
     ${CMAKE_CURRENT_SOURCE_DIR}/src/connect.cpp)
 
 target_include_directories(DOGIToys
