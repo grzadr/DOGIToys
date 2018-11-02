@@ -39,14 +39,14 @@ namespace DOGIToys {
 class DOGI {
  private:
   // Database handler
-  unique_ptr<QSqlDatabase> db{nullptr};
+  //  unique_ptr<QSqlDatabase> db{nullptr};
 
-  QString name{};
-  inline static const QString driver{"QSQLITE"};
-  QFile db_file{};
+  //  QString name{};
+  //  inline static const QString driver{"QSQLITE"};
+  //  QFile db_file{};
   //  QFileInfo db_file_info{};
-  int taxon_id{0};
-  QString taxon_name{};
+  //  int taxon_id{0};
+  //  QString taxon_name{};
 
   //  inline const static QStringList sqlite_opening{"PRAGMA encoding =
   //  'UTF-8';",
@@ -61,14 +61,14 @@ class DOGI {
   //                                                 "PRAGMA integrity_check;",
   //                                                 "PRAGMA optimize;"};
 
-  void prepare(QSqlQuery &query, const QString &command) {
-    DOGITools::prepare(query, command);
-  }
+  //  void prepare(QSqlQuery &query, const QString &command) {
+  //    DOGITools::prepare(query, command);
+  //  }
 
-  void execBatch(QSqlQuery &queries) { DOGITools::exec(queries); }
-  void exec(QSqlQuery &query) { DOGITools::exec(query); }
-  void exec(const QString &query) { DOGITools::exec(*db, query); }
-  void exec(const QStringList &queries) { DOGITools::exec(*db, queries); }
+  //  void execBatch(QSqlQuery &queries) { DOGITools::exec(queries); }
+  //  void exec(QSqlQuery &query) { DOGITools::exec(query); }
+  //  void exec(const QString &query) { DOGITools::exec(*db, query); }
+  //  void exec(const QStringList &queries) { DOGITools::exec(*db, queries); }
 
   //  void remove_data_table(const QString &name);
   //  void remove_data_table_group(const QString &group);

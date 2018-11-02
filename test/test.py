@@ -6,10 +6,26 @@ path.append(".")
 
 from pyDOGIToys import DOGI
 
-print(path)
-
-db = DOGI();
-db.open("temp.db", True)
-db.close(True);
-
-
+def main():
+    print("Testing pyDOGIToys")
+    print("Create basic connector")
+    db = DOGI();
+    print("Done!\n")
+    print("Test - Creating new database")
+    db.open("temp.db", True)
+    print("Done!\n")
+    print("Test - Closing connection")
+    db.close(True);
+    print("Done!\n")
+    print("Test - Opening connection")
+    db.open("temp.db")
+    print("Done!\n")
+    print("Test - setTaxon('human')")
+    db.setTaxon("human")
+    print(db.getTaxonName())
+    print("Test - Done!\n")
+    print("Test - setTaxon(9615)")
+    db.setTaxon(9615, True)
+    print(db.getTaxonName())
+    print("Test - Done!\n")
+main()

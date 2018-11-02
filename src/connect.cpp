@@ -1,4 +1,6 @@
-#include <dogitoys/connect.hpp>
+#include "dogitoys/connect.hpp"
+
+#include <QDir>
 
 using namespace DOGIToys;
 
@@ -18,21 +20,76 @@ void DOGI::open(const QString &path, bool create) {
         "Close current connection, before opening a new one.");
 
   if (create) {
+    qWarning() << "Removing old database";
     QFile::remove(path);
   } else {
-    if (QFileInfo::exists(path))
+    if (!QFileInfo::exists(path))
       throw_runerror("File doesn't exists\nPath: '" + path + "'");
   }
 
+  qInfo() << "Connecting to DOGI ...";
+
   this->db_file.setFile(path);
 
-  qWarning() << db_file.absoluteFilePath() << db_file.path() << path;
-
-  db = make_unique<QSqlDatabase>(
+  db = make_shared<QSqlDatabase>(
       QSqlDatabase::addDatabase(driver, db_file.absoluteFilePath()));
   db->setDatabaseName(db_file.absoluteFilePath());
+
+  initializer = Initiate::Initializer(db);
 
   if (!db->open())
     throw_runerror("Could not connect to '" + path +
                    "'\nQSqlError: " + this->lastErrorText());
+  else
+    qInfo() << "Connected!";
+
+  if (create) initializer.init_main();
+}
+
+void DOGI::clear_taxon() {
+  id_taxon = 0;
+  taxon_name.clear();
+}
+
+void DOGI::setTaxon() {
+  if (auto value = Select::selectIdTaxon(*db))
+    clear_taxon();
+  else
+    setTaxon(Select::selectTaxonName(*db, *value));
+}
+
+void DOGI::setTaxon(int id_taxon, bool overwrite = false) {
+  auto taxon_name = Select::selectTaxonName(*db, id_taxon);
+
+  if (const auto selected_id_taxon = Select::selectIdTaxon(*db)) {
+    if (overwrite && *selected_id_taxon != id_taxon)
+      Update::UpdateIdTaxon(*db, id_taxon);
+    else
+      throw_runerror("Passed id_taxon deffers from id_taxon in DOGIMaster.");
+  } else
+    Update::UpdateIdTaxon(*db, id_taxon);
+
+  this->id_taxon = id_taxon;
+  this->taxon_name = taxon_name.toStdString();
+}
+
+void DOGI::setTaxon(QString organism) {
+  setTaxon(Select::selectIdTaxon(*db, organism));
+}
+
+void DOGI::close(bool optimize) {
+  if (isOpen()) {
+    qInfo() << "Closing connection";
+
+    initializer.reset();
+
+    clear_taxon();
+    this->rollback(true);
+
+    close_sqlite(optimize);
+    db.reset();
+    QSqlDatabase::removeDatabase(db_file.absoluteFilePath());
+
+    qInfo() << "Connection closed";
+  }
 }

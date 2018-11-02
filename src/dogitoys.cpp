@@ -190,30 +190,6 @@ void DOGI::init_annotation() {
   }
 }
 
-void DOGI::init_taxon() {
-  QSqlQuery insert(*db);
-
-  prepare(insert, "INSERT INTO DOGITaxons (id_taxon, name) "
-                  "VALUES (:id_taxon, :name)");
-
-  for (const auto &[id_taxon, name] : Taxons) {
-    insert.bindValue(":id_taxon", id_taxon);
-    insert.bindValue(":name", name);
-    exec(insert);
-    insert.finish();
-  }
-
-  prepare(insert, "INSERT INTO DOGITaxonAliases (id_alias, id_taxon) "
-                  "VALUES (:id_alias, :id_taxon)");
-
-  for (const auto &[id_alias, id_taxon] : TaxonAliases) {
-    insert.bindValue(":id_alias", id_alias);
-    insert.bindValue(":id_taxon", id_taxon);
-    exec(insert);
-    insert.finish();
-  }
-}
-
 void DOGI::init() {
   logger->info("[Init] Engaged");
 

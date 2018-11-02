@@ -9,100 +9,11 @@
 using qp_intqstr = QPair<int, QString>;
 
 namespace DOGIToys {
-
-struct Scheme {
-  //  string category{};
-  QStringList names{};
-  QStringList queries{};
-};
-
-static inline QStringList DOGI_main{
-    // Table of all data tables with information of source
-    // and if it was populated
-    "CREATE TABLE DOGIMaster ("
-    "id_field TEXT NOT NULL COLLATE NOCASE,"
-    "value TEXT DEFAULT NULL COLLATE NOCASE,"
-    "CONSTRAINT length_DOGIMaster_id_field CHECK(LENGTH(id_field)),"
-    "CONSTRAINT length_DOGIMaster_value CHECK(LENGTH(value))"
-    ");",
-    "INSERT INTO DOGIMaster (id_field, value) VALUES ('taxon_id', NULL)",
-    "INSERT INTO DOGIMaster (id_field, value) VALUES ('taxon_name', NULL)",
-
-    // Dogi Annotations
-    "CREATE TABLE DOGIAnnotations ("
-    "source TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
-    "data TEXT COLLATE NOCASE,"
-    ""
-    "CONSTRAINT length_DOGIAnnotations_source CHECK(LENGTH(source)),"
-    "CONSTRAINT length_DOGIAnnotations_data CHECK(LENGTH(data))"
-    ")",
-
-    // Dogi Taxons
-    "CREATE TABLE DOGITaxons ("
-    "id_taxon INTEGER PRIMARY KEY NOT NULL,"
-    "name TEXT NOT NULL COLLATE NOCASE,"
-    ""
-    "CONSTRAINT length_name CHECK(LENGTH(name))"
-    ")",
-
-    "CREATE UNIQUE INDEX idx_DOGITaxons_name ON DOGITaxons(name)",
-
-    "CREATE TABLE DOGITaxonAliases("
-    "id_alias TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
-    "id_taxon INTEGER NOT NULL,"
-    ""
-    "CONSTRAINT length_id_aliast CHECK(LENGTH(id_alias)),"
-    ""
-    "CONSTRAINT fk_TaxonAliases "
-    "FOREIGN KEY (id_taxon)"
-    "REFERENCES DOGITaxons(id_taxon)"
-    ")"};
-
-static inline QVector<QPair<int, QString>> Taxons{
-    {9606, "Homo sapiens"},       {9615, "Canis lupus familiaris"},
-    {9913, "Bos taurus"},         {9823, "Sus scrofa"},
-    {10116, "Rattus norvegicus"}, {10090, "Mus musculus"},
-};
-
-static inline QVector<QPair<QString, int>> TaxonAliases{
-    {"human", 9606},  {"man", 9606},
-
-    {"dog", 9615},    {"dogs", 9615},   {"Canis familiaris", 9615},
-
-    {"cow", 9913},    {"cattle", 9913},
-
-    {"pig", 9823},
-
-    {"rat", 10116},
-
-    {"mouse", 10090},
-};
-
-// static inline Scheme IDSystems{
-//    {"GFF3SystemIDs"},
-//    {
-//        "CREATE TABLE GFF3SystemIDs("
-//        "id_system TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
-//        "system_description TEXT DEFAULT NULL COLLATE NOCASE,"
-//        ""
-//        "CONSTRAINT length_id_system CHECK(LENGTH(id_system))"
-//        ")",
-//        //        "INSERT INTO IDSystems VALUES('GeneID', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('Genbank', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('HGNC', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('HPRD', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('miRBase', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('miRBaseMIMAT', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('CCDS', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('MIM', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('IMGT/GENE-DB', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('taxon', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('gene_id', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('transcript_id', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('protein_id', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('VISTA', NULL)",
-//        //        "INSERT INTO IDSystems VALUES('dbSNP', NULL)",
-//    }};
+// struct Scheme {
+//  //  string category{};
+//  QStringList names{};
+//  QStringList queries{};
+//};
 
 static inline QStringList IDSystems{
     "CREATE TABLE GFF3SystemIDs("
@@ -148,19 +59,20 @@ inline static Scheme GFF3_SeqIDs{
      "REFERENCES GFF3Databases(id_database)"
      ")"}};
 
-inline static QString GFFBasic{"id_database TEXT NOT NULL COLLATE NOCASE,"
-                               "id_feature INTEGER NOT NULL,"
-                               "feature_seqid TEXT NOT NULL COLLATE NOCASE,"
-                               "feature_source TEXT COLLATE NOCASE,"
-                               "feature_type TEXT NOT NULL COLLATE NOCASE,"
-                               "feature_start INT NOT NULL,"
-                               "feature_end INT NOT NULL,"
-                               "feature_length INTEGER NOT NULL,"
-                               "feature_score REAL,"
-                               "feature_strand COLLATE NOCASE,"
-                               "feature_phase INT,"
-                               "feature_id_parent INTEGER,"
-                               "feature_signature TEXT COLLATE NOCASE,"};
+inline static QString GFFBasic{
+    "id_database TEXT NOT NULL COLLATE NOCASE,"
+    "id_feature INTEGER NOT NULL,"
+    "feature_seqid TEXT NOT NULL COLLATE NOCASE,"
+    "feature_source TEXT COLLATE NOCASE,"
+    "feature_type TEXT NOT NULL COLLATE NOCASE,"
+    "feature_start INT NOT NULL,"
+    "feature_end INT NOT NULL,"
+    "feature_length INTEGER NOT NULL,"
+    "feature_score REAL,"
+    "feature_strand COLLATE NOCASE,"
+    "feature_phase INT,"
+    "feature_id_parent INTEGER,"
+    "feature_signature TEXT COLLATE NOCASE,"};
 
 inline static Scheme GFF3_Features{
     {"GFF3Features", "GFF3FeatureAttributes", "GFF3FeatureIDs",
@@ -585,4 +497,4 @@ inline static QStringList RegulatoryFeatures{
     "ON RegulatoryFeatures(id_database, feature_id_parent)",
 };
 
-} // namespace DOGIToys
+}  // namespace DOGIToys

@@ -9,25 +9,34 @@
 #include <QSqlError>
 
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
-#include <dogitoys/tools.hpp>
+#include <dogitoys/query.hpp>
+#include "dogitoys/initiate.hpp"
+#include "dogitoys/tools.hpp"
 
 namespace DOGIToys {
 
+using std::make_shared;
 using std::make_unique;
+using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
 using runerror = std::runtime_error;
+using std::nullopt;
+using std::optional;
 
 class DOGI {
  private:
-  unique_ptr<QSqlDatabase> db{nullptr};
+  shared_ptr<QSqlDatabase> db{nullptr};
   QFileInfo db_file{};
   const QString driver{"QSQLITE"};
-  int taxon_id{0};
-  QString taxon_name{};
+  int id_taxon{0};
+  string taxon_name{};
+
+  Initiate::Initializer initializer{nullptr};
 
   inline const static QStringList sqlite_opening{"PRAGMA encoding = 'UTF-8';",
                                                  "PRAGMA foreign_keys = 1;"};
@@ -67,20 +76,9 @@ class DOGI {
   QSqlError lastError() { return this->db->lastError(); }
   QString lastErrorText() { return this->db->lastError().text(); }
 
-  void transaction() {
-    if (!this->db->transaction())
-      throw_runerror("New transaction failed:\n" + this->lastErrorText());
-  }
-
-  void commit() {
-    if (!this->db->commit())
-      throw_runerror("Commiting failed:\n" + this->lastErrorText());
-  }
-
-  void rollback(bool force = false) {
-    if (!this->db->rollback() and !force)
-      throw_runerror("Rollback failed:\n" + this->lastErrorText());
-  }
+  void transaction() { Execute::transaction(*db); }
+  void commit() { Execute::commit(*db); }
+  void rollback(bool force = false) { Execute::rollback(*db, force); }
 
   QSqlQuery prepare(const QString &query) {
     return Execute::prepare(*this->db, query);
@@ -88,24 +86,28 @@ class DOGI {
 
   template <class Query>
   void exec(const Query &query) {
-    Execute::exec(*this->db, query);
+    Execute::exec(*db, query);
   }
+  void exec(QSqlQuery &query) { Execute::exec(query); }
 
   void execBatch(QSqlQuery &queries) { Execute::execBatch(queries); }
 
   void vacuum() { exec("VACUUM"); }
 
-  void close(bool optimize = false) {
-    if (isOpen()) {
-      //      logger->info("Closing connection and cleaning up");
-      //      clear_taxon();
-      this->rollback(true);
+  void clear_taxon();
 
-      close_sqlite(optimize);
-      db.reset();
-      QSqlDatabase::removeDatabase(db_file.absoluteFilePath());
-    }
+  int getIdTaxon() { return this->id_taxon; }
+  string getTaxonName() {
+    qWarning() << Select::selectIdTaxon(*db).value_or(0);
+    return this->taxon_name;
   }
+
+  void setTaxon();
+  void setTaxon(int name, bool overwrite);
+  void setTaxon(QString name);
+  void setTaxon(string name) { setTaxon(QString::fromStdString(name)); }
+
+  void close(bool optimize = false);
 };
 
 }  // namespace DOGIToys

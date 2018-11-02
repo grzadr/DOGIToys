@@ -5,14 +5,15 @@
 #include <QString>
 #include <QStringList>
 
-#include <exception>
-#include <sstream>
-#include <string>
-#include <vector>
+//#include <exception>
+#include <stdexcept>
+//#include <sstream>
+//#include <string>
+//#include <vector>
 
-using std::string;
-using sstream = std::stringstream;
-using vec_str = std::vector<string>;
+// using std::string;
+// using sstream = std::stringstream;
+// using vec_str = std::vector<string>;
 
 using runerror = std::runtime_error;
 
@@ -53,7 +54,7 @@ namespace DOGIToys {
 //  return input;
 //}
 
-[[noreturn]] void throw_runerror(const QString &message) {
+[[noreturn]] inline void throw_runerror(const QString &message) {
   throw runerror{message.toStdString()};
 }
 
@@ -68,45 +69,5 @@ namespace DOGIToys {
 // inline QString extractID(const QString &id) {
 //  return id.mid(id.indexOf(":") + 1);
 //}
-
-namespace Execute {
-
-inline void prepare(QSqlQuery &query, const QString &command) {
-  if (!query.prepare(command))
-    throw_runerror("Error preparing query:\n" + query.lastQuery() +
-                   "\nMessage:\n" + query.lastError().text());
-}
-
-inline QSqlQuery prepare(const QSqlDatabase &db, const QString &command) {
-  QSqlQuery query(db);
-  if (!query.prepare(command))
-    throw_runerror("Error preparing query:\n" + query.lastQuery() +
-                   "\nMessage:\n" + query.lastError().text());
-  return query;
-}
-
-inline void execBatch(QSqlQuery &queries) {
-  if (!queries.execBatch())
-    throw_runerror("Error executing query:\n" + queries.lastQuery() + "\n" +
-                   queries.lastError().text());
-}
-
-inline void exec(QSqlQuery &query) {
-  if (!query.exec())
-    throw_runerror("Error executing query:\n" + query.lastQuery() + "\n" +
-                   query.lastError().text());
-}
-
-inline void exec(const QSqlDatabase &db, const QString &query) {
-  if (auto result = db.exec(query); !result.isActive())
-    throw_runerror("Error executing query:\n" + query + "\n" +
-                   result.lastError().text());
-}
-
-inline void exec(const QSqlDatabase &db, const QStringList &queries) {
-  for (const auto &query : queries) exec(db, query);
-}
-
-}  // namespace Execute
 
 }  // namespace DOGIToys
