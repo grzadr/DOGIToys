@@ -20,15 +20,22 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       .def("open", py::overload_cast<const string&, bool>(&DOGI::open),
            "path"_a, "create"_a = false)
       .def("close", &DOGI::close, "optimize"_a = false)
+      .def("destroy", &DOGI::destroy, "confirm"_a = false)
+
       .def("clear_taxon", &DOGI::clear_taxon)
+
       .def("getIdTaxon", &DOGI::getIdTaxon)
       .def("getTaxonName", &DOGI::getTaxonName)
+
       .def("setTaxon", py::overload_cast<>(&DOGI::setTaxon))
       .def("setTaxon", py::overload_cast<int, bool>(&DOGI::setTaxon),
            "id_taxon"_a, "overwrite"_a = false)
       .def("setTaxon", py::overload_cast<string>(&DOGI::setTaxon), "name"_a)
+
       //        .def("populate", py::overload_cast<const
       //        string&>(&DOGI::populate), "config"_a) .def("close",
       //        &DOGI::close)
-      ;
+
+      .def("populateFASTA", py::overload_cast<string>(&DOGI::populateFASTA),
+           "fasta_file"_a);
 }

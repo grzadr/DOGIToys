@@ -18,6 +18,7 @@ find_package(Qt5Sql REQUIRED)
 
 add_library(DOGIToys SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/connect.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/populate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/initiate.cpp
     )
 
@@ -50,5 +51,8 @@ install(TARGETS DOGIToys LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY include/dogitoys DESTINATION ${HEADER_INSTALL_PREFIX}/include)
 
 add_custom_command(TARGET pyDOGIToys POST_BUILD
-    COMMAND "python3" "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
+    COMMAND
+        "python3"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

@@ -13,9 +13,9 @@
 #include <stdexcept>
 #include <string>
 
+#include <dogitoys/populate.hpp>
 #include <dogitoys/query.hpp>
-#include "dogitoys/initiate.hpp"
-#include "dogitoys/tools.hpp"
+#include <dogitoys/tools.hpp>
 
 namespace DOGIToys {
 
@@ -36,7 +36,7 @@ class DOGI {
   int id_taxon{0};
   string taxon_name{};
 
-  Initiate::Initializer initializer{nullptr};
+  Populate::Populator populator{};
 
   inline const static QStringList sqlite_opening{"PRAGMA encoding = 'UTF-8';",
                                                  "PRAGMA foreign_keys = 1;"};
@@ -94,20 +94,32 @@ class DOGI {
 
   void vacuum() { exec("VACUUM"); }
 
+  void destroy(bool confirm = false);
+
+  void close(bool optimize = false);
+
   void clear_taxon();
 
   int getIdTaxon() { return this->id_taxon; }
-  string getTaxonName() {
-    qWarning() << Select::selectIdTaxon(*db).value_or(0);
-    return this->taxon_name;
-  }
+  string getTaxonName() { return this->taxon_name; }
 
   void setTaxon();
   void setTaxon(int name, bool overwrite);
   void setTaxon(QString name);
   void setTaxon(string name) { setTaxon(QString::fromStdString(name)); }
 
-  void close(bool optimize = false);
+  void populateGenomes(QString database, QString fasta_file);
+  void populateGenomes(string database, string fasta_file) {
+    populateGenomes(QString::fromStdString(database),
+                    QString::fromStdString(fasta_file));
+  }
+
+  void populateFASTA(QString fasta_file) {
+    populator.populateFASTA(fasta_file);
+  }
+  void populateFASTA(string fasta_file) {
+    populateFASTA(QString::fromStdString(fasta_file));
+  }
 };
 
 }  // namespace DOGIToys

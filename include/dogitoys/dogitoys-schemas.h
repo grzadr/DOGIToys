@@ -360,30 +360,6 @@ inline static QStringList GeneOntology{
     "WHERE go_is_a = GOSLave.go_slave "
     ") SELECT * FROM GOSlave)"};
 
-inline static QStringList Genomes{
-    "DROP TABLE IF EXISTS Genomes",
-    "CREATE TABLE Genomes ("
-    "id_database TEXT NOT NULL COLLATE NOCASE, "
-    "masking TEXT NOT NULL COLLATE NOCASE, "
-    "id_chrom TEXT NOT NULL COLLATE NOCASE, "
-    "seq TEXT NOT NULL COLLATE NOCASE, "
-    ""
-    "PRIMARY KEY (id_database, id_chrom, masking), "
-    ""
-    "CONSTRAINT masking_values CHECK(masking IN ('hard', 'soft', 'none')), "
-    "CONSTRAINT length_seq CHECK(LENGTH(seq)), "
-    ""
-    "CONSTRAINT fk_id_database "
-    "FOREIGN KEY (id_database) "
-    "REFERENCES GFF3Databases(id_database)"
-    "ON DELETE CASCADE, "
-    ""
-    "CONSTRAINT fk_Features_seqid "
-    "FOREIGN KEY (id_database, id_chrom) "
-    "REFERENCES GFF3SeqIDs (id_database, seqid_name) "
-    "ON DELETE CASCADE"
-    ")"};
-
 inline static QStringList Variants{
     "DROP TABLE IF EXISTS VarStructural",
     "DROP TABLE IF EXISTS VarStructuralChildren",

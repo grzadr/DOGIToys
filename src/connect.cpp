@@ -35,7 +35,7 @@ void DOGI::open(const QString &path, bool create) {
       QSqlDatabase::addDatabase(driver, db_file.absoluteFilePath()));
   db->setDatabaseName(db_file.absoluteFilePath());
 
-  initializer = Initiate::Initializer(db);
+  populator.reset(db);
 
   if (!db->open())
     throw_runerror("Could not connect to '" + path +
@@ -43,7 +43,32 @@ void DOGI::open(const QString &path, bool create) {
   else
     qInfo() << "Connected!";
 
-  if (create) initializer.init_main();
+  if (create) populator.initMain();
+}
+
+void DOGI::close(bool optimize) {
+  if (isOpen()) {
+    qInfo() << "Closing connection";
+
+    populator.reset();
+
+    clear_taxon();
+    this->rollback(true);
+
+    close_sqlite(optimize);
+    db.reset();
+    QSqlDatabase::removeDatabase(db_file.absoluteFilePath());
+
+    qInfo() << "Connection closed";
+  }
+}
+
+void DOGI::destroy(bool confirm) {
+  if (confirm) {
+    close();
+    qWarning() << "Removing old database";
+    QFile::remove(db_file.absoluteFilePath());
+  }
 }
 
 void DOGI::clear_taxon() {
@@ -75,21 +100,4 @@ void DOGI::setTaxon(int id_taxon, bool overwrite = false) {
 
 void DOGI::setTaxon(QString organism) {
   setTaxon(Select::selectIdTaxon(*db, organism));
-}
-
-void DOGI::close(bool optimize) {
-  if (isOpen()) {
-    qInfo() << "Closing connection";
-
-    initializer.reset();
-
-    clear_taxon();
-    this->rollback(true);
-
-    close_sqlite(optimize);
-    db.reset();
-    QSqlDatabase::removeDatabase(db_file.absoluteFilePath());
-
-    qInfo() << "Connection closed";
-  }
 }

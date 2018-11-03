@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
-from sys import path
+from sys import path, argv
 
 path.append(".")
 
 from pyDOGIToys import DOGI
 
 def main():
+    print(argv[1])
+    
     print("Testing pyDOGIToys")
     print("Create basic connector")
     db = DOGI();

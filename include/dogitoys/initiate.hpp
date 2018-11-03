@@ -5,10 +5,8 @@
 #include <QVector>
 #include <QtDebug>
 
-#include <memory>
-
 #include <dogitoys/query.hpp>
-#include "dogitoys/tools.hpp"
+#include <dogitoys/tools.hpp>
 
 namespace DOGIToys::Initiate {
 
@@ -72,22 +70,35 @@ static inline QVector<QPair<QString, int>> TaxonAliases{
 
     {"mouse", 10090},
 };
+
+inline static QStringList Genomes{
+    "DROP TABLE IF EXISTS Genomes",
+    "CREATE TABLE Genomes ("
+    "id_database TEXT NOT NULL COLLATE NOCASE, "
+    "masking TEXT NOT NULL COLLATE NOCASE, "
+    "id_chrom TEXT NOT NULL COLLATE NOCASE, "
+    "seq TEXT NOT NULL COLLATE NOCASE, "
+    ""
+    "PRIMARY KEY (id_database, id_chrom, masking), "
+    ""
+    "CONSTRAINT masking_values CHECK(masking IN ('hard', 'soft', 'none')), "
+    "CONSTRAINT length_seq CHECK(LENGTH(seq)), "
+    ""
+    "CONSTRAINT fk_id_database "
+    "FOREIGN KEY (id_database) "
+    "REFERENCES GFF3Databases(id_database)"
+    "ON DELETE CASCADE, "
+    ""
+    "CONSTRAINT fk_Features_seqid "
+    "FOREIGN KEY (id_database, id_chrom) "
+    "REFERENCES GFF3SeqIDs (id_database, seqid_name) "
+    "ON DELETE CASCADE"
+    ")"};
+
 }  // namespace Schemas
 
-using std::shared_ptr;
-using std::weak_ptr;
 using namespace Execute;
 
-class Initializer {
- private:
-  shared_ptr<QSqlDatabase> db{nullptr};
-
- public:
-  Initializer();
-  Initializer(shared_ptr<QSqlDatabase> db) : db{db} {}
-  ~Initializer() = default;
-  void reset();
-  void init_main();
-  void init_taxon();
-};
+void init_main(QSqlDatabase db);
+void init_taxon(QSqlDatabase db, QString taxons = {});
 }  // namespace DOGIToys::Initiate

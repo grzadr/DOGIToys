@@ -102,11 +102,11 @@ class DOGI {
     exec(update);
   }
 
-  qpair_intqstr get_id_taxon(const QString &organism);
-  void clear_taxon();
-  void set_taxon(const qpair_intqstr &organism);
-  void set_taxon();
-  void update_taxon(const qpair_intqstr &organism);
+  //  qpair_intqstr get_id_taxon(const QString &organism);
+  //  void clear_taxon();
+  //  void set_taxon(const qpair_intqstr &organism);
+  //  void set_taxon();
+  //  void update_taxon(const qpair_intqstr &organism);
 
   QPair<QString, int> getFeatureIdFromSignature(const QString &id_database,
                                                 const QString &signature);
