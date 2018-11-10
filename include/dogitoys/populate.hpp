@@ -5,9 +5,12 @@
 
 #include <memory>
 
+#include <dogitoys/genomic_features.hpp>
 #include <dogitoys/initiate.hpp>
 #include <dogitoys/query.hpp>
 #include <dogitoys/tools.hpp>
+
+#include <hkl/gff.hpp>
 
 namespace DOGIToys::Populate {
 
@@ -25,8 +28,10 @@ class Populator {
 
   void initMain();
   void initTaxon();
-  void init_sequences();
+  void initGenomicFeatures();
+  void initSequences();
 
+  void populateGenomicFeatures(QString gff3_file);
   void populateFASTA(QString fasta_file);
 };
 

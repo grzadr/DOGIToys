@@ -73,7 +73,7 @@ inline void exec(const QSqlDatabase &db, const QStringList &queries) {
 
 namespace Select {
 
-inline optional<int> selectIdTaxon(const QSqlDatabase &db) {
+inline optional<int> select_id_taxon(const QSqlDatabase &db) {
   auto select = Execute::prepare(
       db, "SELECT value FROM DOGIMaster WHERE id_field = 'id_taxon'");
   Execute::exec(select);
@@ -88,7 +88,7 @@ inline optional<int> selectIdTaxon(const QSqlDatabase &db) {
     return value.toInt();
 }
 
-inline int selectIdTaxon(const QSqlDatabase &db, const QString &organism) {
+inline int select_id_taxon(const QSqlDatabase &db, const QString &organism) {
   auto taxon_query =
       Execute::prepare(db,
                        "SELECT id_taxon FROM DOGITaxons T "
@@ -106,7 +106,7 @@ inline int selectIdTaxon(const QSqlDatabase &db, const QString &organism) {
   return taxon_query.value(0).toInt();
 }
 
-inline QString selectTaxonName(const QSqlDatabase &db, const int id_taxon) {
+inline QString select_taxon_name(const QSqlDatabase &db, const int id_taxon) {
   auto taxon_query = Execute::prepare(
       db, "SELECT taxon_name FROM DOGITaxons T WHERE id_taxon = ?");
   taxon_query.addBindValue(id_taxon);
@@ -121,7 +121,7 @@ inline QString selectTaxonName(const QSqlDatabase &db, const int id_taxon) {
 
 namespace Update {
 
-inline void UpdateIdTaxon(const QSqlDatabase &db, const int id_taxon) {
+inline void update_id_taxon(const QSqlDatabase &db, const int id_taxon) {
   auto update = Execute::prepare(db,
                                  "UPDATE DOGIMaster SET value = ? "
                                  "WHERE id_field = 'id_taxon'");
@@ -130,4 +130,5 @@ inline void UpdateIdTaxon(const QSqlDatabase &db, const int id_taxon) {
 }
 
 }  // namespace Update
+
 }  // namespace DOGIToys

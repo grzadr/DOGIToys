@@ -85,23 +85,6 @@ class DOGI {
 
   void register_annotation(const QString &source, const QString &data);
 
-  template <typename T>
-  void UpdateTableField(const QString &table, const QString &database,
-                        int id_feature, const QString &field, const T &value) {
-    QSqlQuery update(*db);
-
-    prepare(update,
-            "UPDATE " + table + " SET " + field +
-                " = :value "
-                "WHERE id_database = :database AND id_feature = :id_feature");
-
-    update.bindValue(":value", value);
-    update.bindValue(":database", database);
-    update.bindValue(":id_feature", id_feature);
-
-    exec(update);
-  }
-
   //  qpair_intqstr get_id_taxon(const QString &organism);
   //  void clear_taxon();
   //  void set_taxon(const qpair_intqstr &organism);
@@ -241,16 +224,16 @@ class DOGI {
   // Exceptions:
   //   1) Can't create database file -> runtime_error.
 
-  void open(const QString &path, bool replace = false);
+  //  void open(const QString &path, bool replace = false);
 
-  void open(const string &path, bool replace = false) {
-    this->open(QString::fromStdString(path), replace);
-  }
-  void open(const char *path, bool replace = false) {
-    this->open(QString::fromLatin1(path), replace);
-  }
+  //  void open(const string &path, bool replace = false) {
+  //    this->open(QString::fromStdString(path), replace);
+  //  }
+  //  void open(const char *path, bool replace = false) {
+  //    this->open(QString::fromLatin1(path), replace);
+  //  }
 
-  void close(bool soft = false);
+  //  void close(bool soft = false);
 
   void init();
   void initGeneOntology() { exec(GeneOntology); }

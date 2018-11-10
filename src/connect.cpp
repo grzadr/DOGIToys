@@ -77,27 +77,31 @@ void DOGI::clear_taxon() {
 }
 
 void DOGI::setTaxon() {
-  if (auto value = Select::selectIdTaxon(*db))
+  if (auto value = Select::select_id_taxon(*db))
     clear_taxon();
   else
-    setTaxon(Select::selectTaxonName(*db, *value));
+    setTaxon(Select::select_taxon_name(*db, *value));
 }
 
 void DOGI::setTaxon(int id_taxon, bool overwrite = false) {
-  auto taxon_name = Select::selectTaxonName(*db, id_taxon);
+  auto taxon_name = Select::select_taxon_name(*db, id_taxon);
 
-  if (const auto selected_id_taxon = Select::selectIdTaxon(*db)) {
+  if (const auto selected_id_taxon = Select::select_id_taxon(*db)) {
     if (overwrite && *selected_id_taxon != id_taxon)
-      Update::UpdateIdTaxon(*db, id_taxon);
+      Update::update_id_taxon(*db, id_taxon);
     else
       throw_runerror("Passed id_taxon deffers from id_taxon in DOGIMaster.");
   } else
-    Update::UpdateIdTaxon(*db, id_taxon);
+    Update::update_id_taxon(*db, id_taxon);
 
   this->id_taxon = id_taxon;
   this->taxon_name = taxon_name.toStdString();
 }
 
 void DOGI::setTaxon(QString organism) {
-  setTaxon(Select::selectIdTaxon(*db, organism));
+  setTaxon(Select::select_id_taxon(*db, organism));
+}
+
+void DOGI::populateGenomicFeatures(QString gff3_file) {
+  populator.populateGenomicFeatures(gff3_file);
 }

@@ -71,6 +71,126 @@ static inline QVector<QPair<QString, int>> TaxonAliases{
     {"mouse", 10090},
 };
 
+inline static QStringList SeqIDs{
+    "CREATE TABLE SeqIDs ("
+    "seqid_name TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
+    "seqid_start INT NOT NULL,"
+    "seqid_end INT NOT NULL,"
+    "seqid_length INT NOT NULL,"
+    "seqid_strand TEXT DEFAULT NULL,"
+    ""
+    "CONSTRAINT length_seqid_name CHECK(LENGTH(seqid_name)), "
+    ""
+    "CONSTRAINT value_seqid_start CHECK(seqid_start > 0), "
+    "CONSTRAINT value_seqid_end CHECK(seqid_end >= seqid_start)"
+    ")",
+};
+
+inline static QString GFFBasic{
+    "id_feature INTEGER PRIMARY KEY NOT NULL,"
+    "feature_seqid TEXT NOT NULL COLLATE NOCASE,"
+    "feature_source TEXT COLLATE NOCASE,"
+    "feature_type TEXT NOT NULL COLLATE NOCASE,"
+    "feature_start INT NOT NULL,"
+    "feature_end INT NOT NULL,"
+    "feature_length INTEGER NOT NULL,"
+    "feature_score REAL,"
+    "feature_strand COLLATE NOCASE,"
+    "feature_phase INT,"
+    "feature_id_parent INTEGER,"
+    "feature_signature TEXT COLLATE NOCASE,"};
+
+inline static QStringList GenomicFeatures{
+    "DROP TABLE IF EXISTS GenomicFeatures",
+    "CREATE TABLE GenomicFeatures(" + GFFBasic +
+        "feature_name TEXT COLLATE NOCASE,"
+        "feature_biotype TEXT COLLATE NOCASE,"
+        ""
+        "CONSTRAINT length_type CHECK(LENGTH(feature_type)),"
+        "CONSTRAINT length_signature "
+        "CHECK(feature_signature IS NULL OR LENGTH(feature_signature)),"
+        "CHECK(feature_name IS NULL OR LENGTH(feature_name)),"
+        "CHECK(feature_biotype IS NULL OR LENGTH(feature_biotype)),"
+
+        "CONSTRAINT value_start CHECK(feature_start > 0),"
+        "CONSTRAINT value_end CHECK(feature_end >= feature_start),"
+        "CONSTRAINT value_strand "
+        "CHECK(feature_strand IS NULL OR feature_strand IN ('+', '-')),"
+        ""
+        "CONSTRAINT fk_GenomicAnnotation_seqid "
+        "FOREIGN KEY (feature_seqid) "
+        "REFERENCES SeqIDs (seqid_name),"
+        ""
+        "CONSTRAINT fk_Features_id_parent "
+        "FOREIGN KEY (feature_id_parent) "
+        "REFERENCES GenomicFeatures (id_feature)"
+        ""
+        ")",
+
+    "CREATE INDEX idx_GenomicFeatures_seqid ON GenomicFeatures(feature_seqid)",
+    "CREATE INDEX idx_GenomicFeatures_type ON GenomicFeatures(feature_type)",
+    "CREATE INDEX idx_GenomicFeatures_start ON GenomicFeatures(feature_start)",
+    "CREATE INDEX idx_GenomicFeatures_end ON GenomicFeatures(feature_end)",
+    "CREATE INDEX idx_GenomicFeatures_name ON GenomicFeatures(feature_name)",
+
+    "CREATE INDEX idx_GenomicFeatures_signature ON "
+    "GenomicFeatures(feature_signature)",
+
+    "CREATE INDEX idx_GenomicFeatures_parent ON "
+    "GenomicFeatures(feature_id_parent)",
+
+    "CREATE INDEX idx_GenomicFeatures_biotype ON "
+    "GenomicFeatures(feature_biotype)",
+
+    "DROP TABLE IF EXISTS GenomicFeatureAttributes",
+    "CREATE TABLE GenomicFeatureAttributes ("
+    "id_feature INTEGER NOT NULL,"
+    "feature_attr_name TEXT NOT NULL COLLATE NOCASE,"
+    "feature_attr_value TEXT NOT NULL COLLATE NOCASE,"
+    ""
+    "PRIMARY KEY (id_feature, feature_attr_name),"
+    ""
+    "CONSTRAINT fk_GenomicFeaturesAttributes_id_feature "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures(id_feature)"
+    ")",
+
+    "CREATE INDEX idx_GenomicFeatureAttributes_name_value ON "
+    "GenomicFeatureAttributes(feature_attr_name, feature_attr_value)",
+
+    "DROP TABLE IF EXISTS GenomicFeatureIDs",
+    "CREATE TABLE GenomicFeatureIDs("
+    "id_feature INTEGER NOT NULL,"
+    "id_system TEXT NOT NULL COLLATE NOCASE,"
+    "feature_idx TEXT NOT NULL COLLATE NOCASE,"
+    ""
+    "PRIMARY KEY (id_system, feature_idx, id_feature),"
+    ""
+    "CONSTRAINT length_feature_idx_length CHECK(LENGTH(feature_idx)),"
+    ""
+    "CONSTRAINT fk_GenomicFeatureIDs_feature "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures (id_feature)"
+    ")",
+
+    "DROP TABLE IF EXISTS GenomicFeatureAliases",
+    "CREATE TABLE GenomicFeatureAliases("
+    "id_feature INTEGER NOT NULL,"
+    "feature_alias TEXT NOT NULL,"
+    ""
+    "PRIMARY KEY (feature_alias, id_feature),"
+    ""
+    "CONSTRAINT length_alias CHECK(LENGTH(feature_alias)),"
+    ""
+    "CONSTRAINT fk_FeatureIDs_feature "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures (id_feature)"
+    ")",
+
+    "CREATE INDEX idx_GFF3FeatureAliases_alias "
+    "ON GenomicFeatureAliases(feature_alias)",
+};
+
 inline static QStringList Genomes{
     "DROP TABLE IF EXISTS Genomes",
     "CREATE TABLE Genomes ("
@@ -101,4 +221,5 @@ using namespace Execute;
 
 void init_main(QSqlDatabase db);
 void init_taxon(QSqlDatabase db, QString taxons = {});
+void init_genomic_features(QSqlDatabase db);
 }  // namespace DOGIToys::Initiate

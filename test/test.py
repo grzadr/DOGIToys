@@ -7,8 +7,8 @@ path.append(".")
 from pyDOGIToys import DOGI
 
 def main():
-    print(argv[1])
-    
+    input_dir = argv[1]
+
     print("Testing pyDOGIToys")
     print("Create basic connector")
     db = DOGI();
@@ -30,4 +30,6 @@ def main():
     db.setTaxon(9615, True)
     print(db.getTaxonName())
     print("Test - Done!\n")
+
+    db.populateGenomicFeatures(input_dir + "/annotation.gff")
 main()

@@ -1,12 +1,12 @@
 #include "dogitoys/initiate.hpp"
 
 void DOGIToys::Initiate::init_main(QSqlDatabase db) {
-  qInfo() << "Initiating main tables";
+  qInfo() << "Initiating Main Tables";
   Execute::exec(db, Schemas::DOGI_main);
 }
 
 void DOGIToys::Initiate::init_taxon(QSqlDatabase db, QString taxons) {
-  qInfo() << "Initiating taxons";
+  qInfo() << "Initiating Taxons";
   if (taxons.isEmpty()) {
     db.transaction();
     auto insert = prepare(db,
@@ -35,4 +35,10 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase db, QString taxons) {
   } else {
     throw_runerror("Loading taxons from external file is not supported!!!");
   }
+}
+
+void DOGIToys::Initiate::init_genomic_features(QSqlDatabase db) {
+  qInfo() << "Initiating GenomicFeatures";
+  Execute::exec(db, Schemas::SeqIDs);
+  Execute::exec(db, Schemas::GenomicFeatures);
 }

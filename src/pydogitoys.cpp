@@ -36,6 +36,10 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       //        string&>(&DOGI::populate), "config"_a) .def("close",
       //        &DOGI::close)
 
+      .def("populateGenomicFeatures",
+           py::overload_cast<string>(&DOGI::populateGenomicFeatures),
+           "gff3_file"_a)
+
       .def("populateFASTA", py::overload_cast<string>(&DOGI::populateFASTA),
            "fasta_file"_a);
 }

@@ -20,6 +20,7 @@ add_library(DOGIToys SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/connect.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/populate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/initiate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/genomic_features.cpp
     )
 
 target_include_directories(DOGIToys
@@ -42,6 +43,8 @@ pybind11_add_module(pyDOGIToys ${CMAKE_CURRENT_SOURCE_DIR}/src/pydogitoys.cpp)
 target_include_directories(pyDOGIToys
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/hkl/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/hkl/agizmo/include
 )
 set(PYBIND11_CPP_STANDARD -std=c++17)
 target_compile_options(pyDOGIToys PRIVATE -Werror -Wall -pthread)

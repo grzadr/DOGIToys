@@ -120,6 +120,11 @@ class DOGI {
   void populateFASTA(string fasta_file) {
     populateFASTA(QString::fromStdString(fasta_file));
   }
+
+  void populateGenomicFeatures(QString gff3_file);
+  void populateGenomicFeatures(string gff3_file) {
+    populateGenomicFeatures(QString::fromStdString(gff3_file));
+  }
 };
 
 }  // namespace DOGIToys
