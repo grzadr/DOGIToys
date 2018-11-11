@@ -18,9 +18,9 @@ find_package(Qt5Sql REQUIRED)
 
 add_library(DOGIToys SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/connect.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/populate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/initiate.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/genomic_features.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/populate.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/genomic_features.cpp
     )
 
 target_include_directories(DOGIToys
@@ -31,10 +31,14 @@ target_include_directories(DOGIToys
 )
 
 target_compile_features(DOGIToys PRIVATE cxx_std_17)
-#target_compile_options(DOGIToys PRIVATE -march=x86-64 -mtune=native -O3 -g0
+#target_compile_options(DOGIToys PRIVATE -march=x86-64 -mtune=native -O3
 #                       -pipe -fPIE -fPIC -fstack-protector-strong -fno-plt
 #                       -fvisibility=hidden -Werror -Wall -pthread)
-target_compile_options(DOGIToys PRIVATE -Werror -Wall -pthread)
+target_compile_options(DOGIToys PRIVATE
+    -Werror -Wall
+    -pthread -O3
+    -mtune=native -march=x86-64
+    -pipe -fPIE -fPIC)
 
 target_link_libraries(DOGIToys Qt5::Core Qt5::Sql)
 
@@ -49,6 +53,11 @@ target_include_directories(pyDOGIToys
 set(PYBIND11_CPP_STANDARD -std=c++17)
 target_compile_options(pyDOGIToys PRIVATE -Werror -Wall -pthread)
 target_link_libraries(pyDOGIToys PRIVATE DOGIToys)
+target_compile_options(pyDOGIToys PRIVATE
+    -Werror -Wall
+    -pthread -O3
+    -mtune=native -march=x86-64
+    -pipe -fPIE -fPIC)
 
 install(TARGETS DOGIToys LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY include/dogitoys DESTINATION ${HEADER_INSTALL_PREFIX}/include)

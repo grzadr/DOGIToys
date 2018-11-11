@@ -1,4 +1,4 @@
-#include <dogitoys/populate.hpp>
+#include <dogitoys/populate/populate.hpp>
 
 #include <iomanip>
 
@@ -34,11 +34,11 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file) {
       const auto& comment = std::get<0>(*record);
       if (const auto& seqid = comment.getRegion())
         insert_SeqID(*db, QString::fromStdString((*seqid).getChrom()),
-                     (*seqid).getFirst(), (*seqid).getLast(),
-                     (*seqid).getStrand());
+                     (*seqid).getFirst(), (*seqid).getLast());
     } else {
-      GenomicFeature feature(std::move(std::get<1>(*record)));
-      feature.insert(*db);
+      GenomicFeature feature(*db, std::move(std::get<1>(*record)));
+      if (const auto id_feature = feature.insert(); id_feature % 50000 == 0)
+        qInfo() << id_feature;
     }
   }
 

@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <dogitoys/populate.hpp>
+#include <dogitoys/populate/populate.hpp>
 #include <dogitoys/query.hpp>
 #include <dogitoys/tools.hpp>
 

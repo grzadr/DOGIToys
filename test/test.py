@@ -31,5 +31,8 @@ def main():
     print(db.getTaxonName())
     print("Test - Done!\n")
 
-    db.populateGenomicFeatures(input_dir + "/annotation.gff")
+    # db.populateGenomicFeatures(input_dir + "/annotation.gff")
+    db.populateGenomicFeatures("/Dropbox/Dropbox/DOGI/Sources/Ensembl/"
+                               "94/GeneAnnotations/homo_sapiens/"
+                               "Homo_sapiens.GRCh38.94.gff3")
 main()

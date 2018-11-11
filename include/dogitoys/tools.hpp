@@ -7,6 +7,7 @@
 
 //#include <exception>
 #include <stdexcept>
+#include <string>
 //#include <sstream>
 //#include <string>
 //#include <vector>
@@ -54,8 +55,16 @@ namespace DOGIToys {
 //  return input;
 //}
 
+[[noreturn]] inline void throw_runerror(const char *message) {
+  throw runerror{message};
+}
+
 [[noreturn]] inline void throw_runerror(const QString &message) {
   throw runerror{message.toStdString()};
+}
+
+[[noreturn]] inline void throw_runerror(const std::string &message) {
+  throw runerror{message};
 }
 
 // inline QString chop(const QString &source, QChar terminator = '.') {

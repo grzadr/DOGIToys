@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include <dogitoys/genomic_features.hpp>
 #include <dogitoys/initiate.hpp>
+#include <dogitoys/populate/genomic_features.hpp>
 #include <dogitoys/query.hpp>
 #include <dogitoys/tools.hpp>
 

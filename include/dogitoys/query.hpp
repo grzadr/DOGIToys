@@ -117,6 +117,33 @@ inline QString select_taxon_name(const QSqlDatabase &db, const int id_taxon) {
 
   return taxon_query.value(0).toString();
 }
+
+inline int select_max_id(const QSqlDatabase &db, const QString &table,
+                         const QString &id_field) {
+  auto select = Execute::prepare(db, "SELECT IFNULL(MAX(" + id_field +
+                                         "), 0) as id_feature FROM " + table);
+  Execute::exec(select);
+  if (!select.next())
+    throw_runerror("I have no idea what happened ...\n" +
+                   db.lastError().text());
+
+  return select.value(0).toInt();
+}
+
+inline int select_id(const QSqlDatabase &db, const QString &table,
+                     const QString &id_field, const QString &signature_field,
+                     const QString &signature) {
+  auto select = Execute::prepare(
+      db, "SELECT " + id_field + " as id_feature FROM " + table + " WHERE " +
+              signature_field + " = :signature");
+  select.bindValue(":signature", signature);
+  Execute::exec(select);
+
+  if (!select.next())
+    return 0;
+  else
+    return select.value(0).toInt();
+}
 }  // namespace Select
 
 namespace Update {
