@@ -16,7 +16,7 @@ namespace DOGIToys {
 using std::nullopt;
 using std::optional;
 
-namespace Execute {
+namespace Transaction {
 
 inline void transaction(QSqlDatabase &db) {
   if (!db.transaction())
@@ -32,6 +32,10 @@ inline void rollback(QSqlDatabase &db, bool force = false) {
   if (!db.rollback() and !force)
     throw_runerror("Rollback failed:\n" + db.lastError().text());
 }
+
+}  // namespace Transaction
+
+namespace Execute {
 
 inline void prepare(QSqlQuery &query, const QString &command) {
   if (!query.prepare(command))
@@ -91,10 +95,10 @@ inline optional<int> select_id_taxon(const QSqlDatabase &db) {
 inline int select_id_taxon(const QSqlDatabase &db, const QString &organism) {
   auto taxon_query =
       Execute::prepare(db,
-                       "SELECT id_taxon FROM DOGITaxons T "
+                       "SELECT id_taxon FROM Taxons T "
                        "WHERE CAST(id_taxon AS TEXT) = ? OR taxon_name = ? "
                        "OR id_taxon = (SELECT id_taxon "
-                       "FROM DOGITaxonAliases WHERE id_alias = ?)");
+                       "FROM TaxonAliases WHERE id_alias = ?)");
   taxon_query.addBindValue(organism);
   taxon_query.addBindValue(organism);
   taxon_query.addBindValue(organism);
@@ -108,7 +112,7 @@ inline int select_id_taxon(const QSqlDatabase &db, const QString &organism) {
 
 inline QString select_taxon_name(const QSqlDatabase &db, const int id_taxon) {
   auto taxon_query = Execute::prepare(
-      db, "SELECT taxon_name FROM DOGITaxons T WHERE id_taxon = ?");
+      db, "SELECT taxon_name FROM Taxons T WHERE id_taxon = ?");
   taxon_query.addBindValue(id_taxon);
   Execute::exec(taxon_query);
 

@@ -16,18 +16,25 @@ void DOGIToys::Populate::Populator::initGenomicFeatures() {
   Initiate::init_genomic_features(*db);
 }
 
+void DOGIToys::Populate::Populator::initGenomicSequences() {
+  Initiate::init_genomic_sequences(*db);
+}
+
 void DOGIToys::Populate::Populator::initSequences() {
   qWarning() << db->tables();
 }
 
-void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file) {
+void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
+                                                            bool initiate) {
   qInfo() << "Populating Genomic Features";
+
+  if (initiate) initGenomicFeatures();
 
   qInfo() << "File:" << gff3_file;
 
   HKL::GFF::GFFReader reader(gff3_file.toStdString());
 
-  db->transaction();
+  Transaction::transaction(*db);
 
   while (auto record = reader()) {
     if ((*record).index() == 0) {
@@ -42,7 +49,20 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file) {
     }
   }
 
-  db->commit();
+  Transaction::commit(*db);
+}
+
+void DOGIToys::Populate::Populator::populateGenomicSequences(QString fasta_file,
+                                                             QString masking,
+                                                             bool initiate) {
+  qInfo() << "Populating GenomicSequences";
+  qInfo() << "Reading FASTA" << fasta_file;
+
+  HKL::FASTAReader reader(fasta_file.toStdString());
+
+  while (const auto seq = reader.readFASTASeq()) {
+    std::cerr << (*seq).getName() << "\n";
+  }
 }
 
 void DOGIToys::Populate::Populator::populateFASTA(QString fasta_file) {}

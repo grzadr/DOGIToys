@@ -32,13 +32,14 @@ PYBIND11_MODULE(pyDOGIToys, m) {
            "id_taxon"_a, "overwrite"_a = false)
       .def("setTaxon", py::overload_cast<string>(&DOGI::setTaxon), "name"_a)
 
-      //        .def("populate", py::overload_cast<const
-      //        string&>(&DOGI::populate), "config"_a) .def("close",
-      //        &DOGI::close)
-
       .def("populateGenomicFeatures",
-           py::overload_cast<string>(&DOGI::populateGenomicFeatures),
-           "gff3_file"_a)
+           py::overload_cast<string, bool>(&DOGI::populateGenomicFeatures),
+           "gff3_file"_a, "initiate"_a = false)
+
+      .def("populateGenomicSequences",
+           py::overload_cast<string, string, bool>(
+               &DOGI::populateGenomicSequences),
+           "fasta_file"_a, "masking"_a, "overwrite"_a = false)
 
       .def("populateFASTA", py::overload_cast<string>(&DOGI::populateFASTA),
            "fasta_file"_a);

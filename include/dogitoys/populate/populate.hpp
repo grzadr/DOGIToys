@@ -11,6 +11,7 @@
 #include <dogitoys/tools.hpp>
 
 #include <hkl/gff.hpp>
+#include <hkl/regionseq.hpp>
 
 namespace DOGIToys::Populate {
 
@@ -29,9 +30,13 @@ class Populator {
   void initMain();
   void initTaxon();
   void initGenomicFeatures();
+  void initGenomicSequences();
   void initSequences();
 
-  void populateGenomicFeatures(QString gff3_file);
+  void populateGenomicFeatures(QString gff3_file, bool initiate = false);
+  void populateGenomicSequences(QString fasta_file, QString masking,
+                                bool initiate = false);
+
   void populateFASTA(QString fasta_file);
 };
 

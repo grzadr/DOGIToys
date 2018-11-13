@@ -76,9 +76,9 @@ class DOGI {
   QSqlError lastError() { return this->db->lastError(); }
   QString lastErrorText() { return this->db->lastError().text(); }
 
-  void transaction() { Execute::transaction(*db); }
-  void commit() { Execute::commit(*db); }
-  void rollback(bool force = false) { Execute::rollback(*db, force); }
+  void transaction() { Transaction::transaction(*db); }
+  void commit() { Transaction::commit(*db); }
+  void rollback(bool force = false) { Transaction::rollback(*db, force); }
 
   QSqlQuery prepare(const QString &query) {
     return Execute::prepare(*this->db, query);
@@ -121,9 +121,17 @@ class DOGI {
     populateFASTA(QString::fromStdString(fasta_file));
   }
 
-  void populateGenomicFeatures(QString gff3_file);
-  void populateGenomicFeatures(string gff3_file) {
-    populateGenomicFeatures(QString::fromStdString(gff3_file));
+  void populateGenomicFeatures(QString gff3_file, bool initiate = false);
+  void populateGenomicFeatures(string gff3_file, bool initiate = false) {
+    populateGenomicFeatures(QString::fromStdString(gff3_file), initiate);
+  }
+
+  void populateGenomicSequences(QString fasta_file, QString masking,
+                                bool overwrite = false);
+  void populateGenomicSequences(string fasta_file, string masking,
+                                bool overwrite = false) {
+    populateGenomicSequences(QString::fromStdString(fasta_file),
+                             QString::fromStdString(masking), overwrite);
   }
 };
 

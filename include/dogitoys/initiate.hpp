@@ -22,25 +22,20 @@ static inline QStringList DOGI_main{
     ");",
 
     "INSERT INTO DOGIMaster (id_field) VALUES ('id_taxon');",
+};
 
-    //    "CREATE TABLE DOGIAnnotations ("
-    //    "source TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
-    //    "data TEXT COLLATE NOCASE,"
-    //    ""
-    //    "CONSTRAINT length_DOGIAnnotations_source CHECK(LENGTH(source)),"
-    //    "CONSTRAINT length_DOGIAnnotations_data CHECK(LENGTH(data))"
-    //    ")",
+static inline QStringList Taxons{
 
-    "CREATE TABLE DOGITaxons ("
+    "CREATE TABLE Taxons ("
     "id_taxon INTEGER PRIMARY KEY NOT NULL,"
     "taxon_name TEXT NOT NULL COLLATE NOCASE,"
     ""
     "CONSTRAINT length_name CHECK(LENGTH(taxon_name))"
     ")",
 
-    "CREATE UNIQUE INDEX idx_DOGITaxons_name ON DOGITaxons(taxon_name)",
+    "CREATE UNIQUE INDEX idx_Taxons_name ON Taxons(taxon_name)",
 
-    "CREATE TABLE DOGITaxonAliases("
+    "CREATE TABLE TaxonAliases("
     "id_alias TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
     "id_taxon INTEGER NOT NULL,"
     ""
@@ -48,16 +43,17 @@ static inline QStringList DOGI_main{
     ""
     "CONSTRAINT fk_TaxonAliases "
     "FOREIGN KEY (id_taxon)"
-    "REFERENCES DOGITaxons(id_taxon)"
-    ")"};
+    "REFERENCES Taxons(id_taxon)"
+    ")",
+};
 
-static inline QVector<QPair<int, QString>> Taxons{
+static inline QVector<QPair<int, QString>> BasicTaxonIDs{
     {9606, "Homo sapiens"},       {9615, "Canis lupus familiaris"},
     {9913, "Bos taurus"},         {9823, "Sus scrofa"},
     {10116, "Rattus norvegicus"}, {10090, "Mus musculus"},
 };
 
-static inline QVector<QPair<QString, int>> TaxonAliases{
+static inline QVector<QPair<QString, int>> BasicTaxonAliases{
     {"human", 9606},  {"man", 9606},
 
     {"dog", 9615},    {"dogs", 9615},   {"Canis familiaris", 9615},
@@ -132,11 +128,13 @@ inline static QStringList GenomicFeatures{
         ""
         "CONSTRAINT fk_GenomicAnnotation_seqid "
         "FOREIGN KEY (feature_seqid) "
-        "REFERENCES SeqIDs (seqid_name),"
+        "REFERENCES SeqIDs (seqid_name) "
+        "ON DELETE CASCADE,"
         ""
         "CONSTRAINT fk_Features_id_parent "
         "FOREIGN KEY (feature_id_parent) "
-        "REFERENCES GenomicFeatures (id_feature)"
+        "REFERENCES GenomicFeatures (id_feature) "
+        "ON DELETE CASCADE"
         ""
         ")",
 
@@ -169,7 +167,8 @@ inline static QStringList GenomicFeatures{
     ""
     "CONSTRAINT fk_GenomicFeaturesAttributes_id_feature "
     "FOREIGN KEY (id_feature) "
-    "REFERENCES GenomicFeatures(id_feature)"
+    "REFERENCES GenomicFeatures(id_feature) "
+    "ON DELETE CASCADE"
     ")",
 
     "CREATE INDEX idx_GenomicFeatureAttributes_name_value ON "
@@ -201,36 +200,36 @@ inline static QStringList GenomicFeatures{
     ""
     "CONSTRAINT fk_FeatureIDs_feature "
     "FOREIGN KEY (id_feature) "
-    "REFERENCES GenomicFeatures (id_feature)"
+    "REFERENCES GenomicFeatures (id_feature) "
+    "ON DELETE CASCADE"
     ")",
 
     "CREATE INDEX idx_GFF3FeatureAliases_alias "
     "ON GenomicFeatureAliases(feature_alias)",
 };
 
-inline static QStringList Genomes{
-    "DROP TABLE IF EXISTS Genomes",
+inline static QStringList GenomicSequences{
+    "DROP TABLE IF EXISTS GenomicSequences",
     "CREATE TABLE Genomes ("
-    "id_database TEXT NOT NULL COLLATE NOCASE, "
-    "masking TEXT NOT NULL COLLATE NOCASE, "
-    "id_chrom TEXT NOT NULL COLLATE NOCASE, "
-    "seq TEXT NOT NULL COLLATE NOCASE, "
+    "id_sequence TEXT NOT NULL COLLATE NOCASE, "
+    "sequence_masking TEXT NOT NULL COLLATE NOCASE, "
+    "sequence_seq TEXT NOT NULL COLLATE NOCASE, "
+    "sequence_length INTEGER NOT NULL, "
     ""
-    "PRIMARY KEY (id_database, id_chrom, masking), "
+    "PRIMARY KEY (id_sequence, sequence_masking), "
     ""
-    "CONSTRAINT masking_values CHECK(masking IN ('hard', 'soft', 'none')), "
-    "CONSTRAINT length_seq CHECK(LENGTH(seq)), "
+    "CONSTRAINT typeof_length CHECK(TYPEOF(sequence_length) = 'integer'), "
     ""
-    "CONSTRAINT fk_id_database "
-    "FOREIGN KEY (id_database) "
-    "REFERENCES GFF3Databases(id_database)"
-    "ON DELETE CASCADE, "
+    "CONSTRAINT values_masking "
+    "CHECK(sequence_masking IN ('hard', 'soft', 'none')), "
+    "CONSTRAINT length_seq CHECK(LENGTH(sequence_seq)), "
     ""
     "CONSTRAINT fk_Features_seqid "
-    "FOREIGN KEY (id_database, id_chrom) "
-    "REFERENCES GFF3SeqIDs (id_database, seqid_name) "
+    "FOREIGN KEY (id_sequence) "
+    "REFERENCES SeqIDs (seqid_name) "
     "ON DELETE CASCADE"
-    ")"};
+    ")",
+};
 
 }  // namespace Schemas
 
@@ -239,4 +238,5 @@ using namespace Execute;
 void init_main(QSqlDatabase db);
 void init_taxon(QSqlDatabase db, QString taxons = {});
 void init_genomic_features(QSqlDatabase db);
+void init_genomic_sequences(QSqlDatabase db);
 }  // namespace DOGIToys::Initiate

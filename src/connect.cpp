@@ -102,6 +102,11 @@ void DOGI::setTaxon(QString organism) {
   setTaxon(Select::select_id_taxon(*db, organism));
 }
 
-void DOGI::populateGenomicFeatures(QString gff3_file) {
-  populator.populateGenomicFeatures(gff3_file);
+void DOGI::populateGenomicFeatures(QString gff3_file, bool initiate) {
+  populator.populateGenomicFeatures(gff3_file, initiate);
+}
+
+void DOGI::populateGenomicSequences(QString fasta_file, QString masking,
+                                    bool overwrite) {
+  populator.populateGenomicSequences(fasta_file, masking, overwrite);
 }
