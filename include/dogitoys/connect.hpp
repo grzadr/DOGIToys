@@ -114,13 +114,6 @@ class DOGI {
                     QString::fromStdString(fasta_file));
   }
 
-  void populateFASTA(QString fasta_file) {
-    populator.populateFASTA(fasta_file);
-  }
-  void populateFASTA(string fasta_file) {
-    populateFASTA(QString::fromStdString(fasta_file));
-  }
-
   void populateGenomicFeatures(QString gff3_file, bool initiate = false);
   void populateGenomicFeatures(string gff3_file, bool initiate = false) {
     populateGenomicFeatures(QString::fromStdString(gff3_file), initiate);

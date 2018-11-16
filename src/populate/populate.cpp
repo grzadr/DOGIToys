@@ -58,11 +58,34 @@ void DOGIToys::Populate::Populator::populateGenomicSequences(QString fasta_file,
   qInfo() << "Populating GenomicSequences";
   qInfo() << "Reading FASTA" << fasta_file;
 
+  masking = masking.toLower();
+  if (masking != "hard" && masking != "soft" && masking != "none")
+    throw_runerror("Unsupported masking: " + masking);
+
+  if (initiate) initGenomicSequences();
+
   HKL::FASTAReader reader(fasta_file.toStdString());
 
-  while (const auto seq = reader.readFASTASeq()) {
-    std::cerr << (*seq).getName() << "\n";
+  Transaction::transaction(*db);
+
+  while (const auto seq = reader.readSeq()) {
+    insertGenomicSequence(*seq, masking);
   }
+
+  Transaction::commit(*db);
 }
 
-void DOGIToys::Populate::Populator::populateFASTA(QString fasta_file) {}
+void DOGIToys::Populate::Populator::insertGenomicSequence(
+    const HKL::RegionSeq& seq, const QString masking) {
+  auto insert = Execute::prepare(*db,
+                                 "INSERT INTO GenomicSequences("
+                                 "id_sequence, sequence_masking,"
+                                 "sequence_seq, sequence_length) "
+                                 "VALUES (:id, :masking, :seq, :length)");
+  insert.bindValue(":id", QString::fromStdString(seq.getName()));
+  insert.bindValue(":masking", masking);
+  insert.bindValue(":seq", QString::fromStdString(seq.getSeq()));
+  insert.bindValue(":length", static_cast<int>(seq.size()));
+
+  Execute::exec(insert);
+}

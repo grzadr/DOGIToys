@@ -210,7 +210,7 @@ inline static QStringList GenomicFeatures{
 
 inline static QStringList GenomicSequences{
     "DROP TABLE IF EXISTS GenomicSequences",
-    "CREATE TABLE Genomes ("
+    "CREATE TABLE GenomicSequences ("
     "id_sequence TEXT NOT NULL COLLATE NOCASE, "
     "sequence_masking TEXT NOT NULL COLLATE NOCASE, "
     "sequence_seq TEXT NOT NULL COLLATE NOCASE, "

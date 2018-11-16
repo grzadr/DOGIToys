@@ -46,7 +46,5 @@ def main():
                                #"94/GeneAnnotations/homo_sapiens/"
                                #"Homo_sapiens.GRCh38.94.gff3")
 
-    db.populateGenomicSequences("/Git/MyPhD/Studies/FatGenes/Download/"
-                                "Ensembl/94/Genomes/homo_sapiens/"
-                                "Homo_sapiens.GRCh38.dna.toplevel.fa", "none", True)
+    db.populateGenomicSequences("/Dropbox/DOGI/Sources/Ensembl/94/Genomes/homo_sapiens/test.fa", "none", True)
 main()

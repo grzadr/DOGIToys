@@ -39,8 +39,5 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       .def("populateGenomicSequences",
            py::overload_cast<string, string, bool>(
                &DOGI::populateGenomicSequences),
-           "fasta_file"_a, "masking"_a, "overwrite"_a = false)
-
-      .def("populateFASTA", py::overload_cast<string>(&DOGI::populateFASTA),
-           "fasta_file"_a);
+           "fasta_file"_a, "masking"_a, "overwrite"_a = false);
 }
