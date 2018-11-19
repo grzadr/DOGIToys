@@ -6,6 +6,7 @@
 #include <QString>
 #include <QStringList>
 #include <QVariant>
+#include <QtDebug>
 
 #include <optional>
 
@@ -19,16 +20,19 @@ using std::optional;
 namespace Transaction {
 
 inline void transaction(QSqlDatabase &db) {
+  qInfo() << "New transaction";
   if (!db.transaction())
     throw_runerror("New transaction failed:\n" + db.lastError().text());
 }
 
 inline void commit(QSqlDatabase &db) {
+  qInfo() << "Commiting transaction";
   if (!db.commit())
     throw_runerror("Commiting failed:\n" + db.lastError().text());
 }
 
 inline void rollback(QSqlDatabase &db, bool force = false) {
+  qInfo() << "Rolling back";
   if (!db.rollback() and !force)
     throw_runerror("Rollback failed:\n" + db.lastError().text());
 }

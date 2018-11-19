@@ -46,7 +46,7 @@ void DOGI::open(const QString &path, bool create) {
   if (create) populator.initMain();
 }
 
-void DOGI::close(bool optimize) {
+void DOGI::close(bool integrity_check, bool optimize) {
   if (isOpen()) {
     qInfo() << "Closing connection";
 
@@ -55,7 +55,7 @@ void DOGI::close(bool optimize) {
     clear_taxon();
     this->rollback(true);
 
-    close_sqlite(optimize);
+    close_sqlite(integrity_check, optimize);
     db.reset();
     QSqlDatabase::removeDatabase(db_file.absoluteFilePath());
 
@@ -98,8 +98,8 @@ void DOGI::setTaxon(int id_taxon, bool overwrite = false) {
   this->taxon_name = taxon_name.toStdString();
 }
 
-void DOGI::setTaxon(QString organism) {
-  setTaxon(Select::select_id_taxon(*db, organism));
+void DOGI::setTaxon(QString organism, bool overwrite) {
+  setTaxon(Select::select_id_taxon(*db, organism), overwrite);
 }
 
 void DOGI::populateGenomicFeatures(QString gff3_file, bool initiate) {
@@ -109,4 +109,8 @@ void DOGI::populateGenomicFeatures(QString gff3_file, bool initiate) {
 void DOGI::populateGenomicSequences(QString fasta_file, QString masking,
                                     bool overwrite) {
   populator.populateGenomicSequences(fasta_file, masking, overwrite);
+}
+
+void DOGI::populateUniprotMap(QString map_file, bool overwrite) {
+  populator.populateUniprotMap(map_file, overwrite);
 }

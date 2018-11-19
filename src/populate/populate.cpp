@@ -20,8 +20,8 @@ void DOGIToys::Populate::Populator::initGenomicSequences() {
   Initiate::init_genomic_sequences(*db);
 }
 
-void DOGIToys::Populate::Populator::initSequences() {
-  qWarning() << db->tables();
+void DOGIToys::Populate::Populator::initUniprotMap() {
+  Initiate::init_uniprot_map(*db);
 }
 
 void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
@@ -88,4 +88,26 @@ void DOGIToys::Populate::Populator::insertGenomicSequence(
   insert.bindValue(":length", static_cast<int>(seq.size()));
 
   Execute::exec(insert);
+}
+
+void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
+                                                       bool overwrite) {
+  qInfo() << "Populating Uniprot Mappings";
+
+  if (overwrite || !db->tables().contains("UniprotMap")) initUniprotMap();
+
+  Transaction::transaction(*db);
+
+  AGizmo::Files::FileReader reader(map_file.toStdString());
+
+  reader();
+
+  while (const auto line = reader()) {
+    Mapping::UniprotMapRecord record(QString::fromStdString(*line));
+    record.insert(*db);
+  }
+
+  qInfo() << "Commiting";
+
+  Transaction::commit(*db);
 }

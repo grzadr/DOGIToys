@@ -7,9 +7,10 @@ void DOGIToys::Initiate::init_main(QSqlDatabase db) {
 
 void DOGIToys::Initiate::init_taxon(QSqlDatabase db, QString taxons) {
   qInfo() << "Initiating Taxons";
+  Transaction::transaction(db);
   Execute::exec(db, Schemas::Taxons);
+
   if (taxons.isEmpty()) {
-    Transaction::transaction(db);
     auto insert = prepare(db,
                           "INSERT INTO Taxons (id_taxon, taxon_name) "
                           "VALUES (:id_taxon, :taxon_name)");
@@ -35,17 +36,29 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase db, QString taxons) {
     Transaction::commit(db);
 
   } else {
+    Transaction::rollback(db);
     throw_runerror("Loading taxons from external file is not supported!!!");
   }
 }
 
 void DOGIToys::Initiate::init_genomic_features(QSqlDatabase db) {
   qInfo() << "Initiating GenomicFeatures";
+  Transaction::transaction(db);
   Execute::exec(db, Schemas::SeqIDs);
   Execute::exec(db, Schemas::GenomicFeatures);
+  Transaction::commit(db);
 }
 
 void DOGIToys::Initiate::init_genomic_sequences(QSqlDatabase db) {
   qInfo() << "Initiating GenomicSequences";
+  Transaction::transaction(db);
   Execute::exec(db, Schemas::GenomicSequences);
+  Transaction::commit(db);
+}
+
+void DOGIToys::Initiate::init_uniprot_map(QSqlDatabase db) {
+  qInfo() << "Initiating UniprotMap";
+  Transaction::transaction(db);
+  Execute::exec(db, Schemas::UniprotMap);
+  Transaction::commit(db);
 }

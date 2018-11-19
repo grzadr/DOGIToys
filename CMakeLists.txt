@@ -21,6 +21,7 @@ add_library(DOGIToys SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/initiate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/populate.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/genomic_features.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/mapping.cpp
     )
 
 target_include_directories(DOGIToys

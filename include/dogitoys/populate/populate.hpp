@@ -7,8 +7,11 @@
 
 #include <dogitoys/initiate.hpp>
 #include <dogitoys/populate/genomic_features.hpp>
+#include <dogitoys/populate/mapping.hpp>
 #include <dogitoys/query.hpp>
 #include <dogitoys/tools.hpp>
+
+#include <agizmo/files.hpp>
 
 #include <hkl/gff.hpp>
 #include <hkl/regionseq.hpp>
@@ -31,13 +34,15 @@ class Populator {
   void initTaxon();
   void initGenomicFeatures();
   void initGenomicSequences();
-  void initSequences();
+  void initUniprotMap();
 
-  void populateGenomicFeatures(QString gff3_file, bool initiate = false);
+  void populateGenomicFeatures(QString gff3_file, bool initiate);
 
   void populateGenomicSequences(QString fasta_file, QString masking,
-                                bool initiate = false);
+                                bool initiate);
   void insertGenomicSequence(const HKL::RegionSeq &seq, const QString masking);
+
+  void populateUniprotMap(const QString map_file, bool overwrite);
 };
 
 }  // namespace DOGIToys::Populate

@@ -42,15 +42,22 @@ class DOGI {
                                                  "PRAGMA foreign_keys = 1;"};
 
   inline const static QStringList sqlite_closing{
+
+  };
+
+  inline const static QStringList sqlite_optimize{
+      "PRAGMA optimize;",
+  };
+
+  inline const static QStringList sqlite_integrity{
       "PRAGMA foreign_key_check;",
       "PRAGMA integrity_check;",
   };
 
-  inline const static QStringList sqlite_optimize{"PRAGMA optimize;"};
-
   void open_sqlite() { this->exec(sqlite_opening); }
-  void close_sqlite(bool optimize = true) {
+  void close_sqlite(bool integrity_check = true, bool optimize = true) {
     exec(sqlite_closing);
+    if (integrity_check) exec(sqlite_integrity);
     if (optimize) exec(sqlite_optimize);
   }
 
@@ -62,7 +69,7 @@ class DOGI {
   DOGI(const char *path, const char *config = "")
       : DOGI(QString::fromLatin1(path), QString::fromLatin1(config)) {}
 
-  ~DOGI() { this->close(false); }
+  ~DOGI() { this->close(false, false); }
 
   void open(const QString &path, bool create = false);
   void open(const string &path, bool create = false) {
@@ -96,7 +103,7 @@ class DOGI {
 
   void destroy(bool confirm = false);
 
-  void close(bool optimize = false);
+  void close(bool integrity_check = true, bool optimize = true);
 
   void clear_taxon();
 
@@ -105,8 +112,10 @@ class DOGI {
 
   void setTaxon();
   void setTaxon(int name, bool overwrite);
-  void setTaxon(QString name);
-  void setTaxon(string name) { setTaxon(QString::fromStdString(name)); }
+  void setTaxon(QString name, bool overwrite = false);
+  void setTaxon(string name, bool overwrite = false) {
+    setTaxon(QString::fromStdString(name), overwrite);
+  }
 
   void populateGenomes(QString database, QString fasta_file);
   void populateGenomes(string database, string fasta_file) {
@@ -114,17 +123,22 @@ class DOGI {
                     QString::fromStdString(fasta_file));
   }
 
-  void populateGenomicFeatures(QString gff3_file, bool initiate = false);
-  void populateGenomicFeatures(string gff3_file, bool initiate = false) {
+  void populateGenomicFeatures(QString gff3_file, bool initiate = true);
+  void populateGenomicFeatures(string gff3_file, bool initiate = true) {
     populateGenomicFeatures(QString::fromStdString(gff3_file), initiate);
   }
 
   void populateGenomicSequences(QString fasta_file, QString masking,
-                                bool overwrite = false);
+                                bool overwrite = true);
   void populateGenomicSequences(string fasta_file, string masking,
-                                bool overwrite = false) {
+                                bool overwrite = true) {
     populateGenomicSequences(QString::fromStdString(fasta_file),
                              QString::fromStdString(masking), overwrite);
+  }
+
+  void populateUniprotMap(QString map_file, bool overwrite = true);
+  void populateUniprotMap(string map_file, bool overwrite = true) {
+    populateUniprotMap(QString::fromStdString(map_file), overwrite);
   }
 };
 

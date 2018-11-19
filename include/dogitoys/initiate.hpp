@@ -68,6 +68,7 @@ static inline QVector<QPair<QString, int>> BasicTaxonAliases{
 };
 
 inline static QStringList SeqIDs{
+    "DROP TABLE IF EXISTS SeqIDs",
     "CREATE TABLE SeqIDs ("
     "seqid_name TEXT PRIMARY KEY NOT NULL COLLATE NOCASE,"
     "seqid_start INT NOT NULL,"
@@ -152,6 +153,8 @@ inline static QStringList GenomicFeatures{
     "GenomicFeatures(feature_name)",
     "CREATE INDEX idx_GenomicFeatures_signature ON "
     "GenomicFeatures(feature_signature)",
+    "CREATE INDEX idx_GenomicFeatures_stable_id ON "
+    "GenomicFeatures(feature_stable_id)",
     "CREATE INDEX idx_GenomicFeatures_parent ON "
     "GenomicFeatures(feature_id_parent)",
     "CREATE INDEX idx_GenomicFeatures_biotype ON "
@@ -231,6 +234,72 @@ inline static QStringList GenomicSequences{
     ")",
 };
 
+inline static QStringList UniprotMap{
+    "DROP TABLE IF EXISTS UniprotMap",
+    "CREATE TABLE UniprotMap ("
+    "uniprot_xref TEXT NOT NULL COLLATE NOCASE,"
+    "id_feature INTEGER NOT NULL, "
+
+    "uniprot_db_name TEXT NOT NULL COLLATE NOCASE, "
+    "uniprot_info_type TEXT NOT NULL COLLATE NOCASE, "
+    "uniprot_source_identity INTEGER DEFAULT NULL, "
+    "uniprot_xref_identity INTEGER DEFAULT NULL, "
+    "uniprot_linkage_type TEXT DEFAULT NULL COLLATE NOCASE, "
+    ""
+    "PRIMARY KEY (uniprot_xref, id_feature),"
+    ""
+    "CONSTRAINT fk_UniprotMap "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures (id_feature)"
+    ")",
+
+    "CREATE INDEX idx_MapUniprot_uniprot_db_name ON "
+    "UniprotMap(uniprot_db_name)",
+    "CREATE INDEX idx_MapUniprot_uniprot_info_type ON "
+    "UniprotMap(uniprot_info_type)",
+
+    //    "CREATE TABLE MapGFF3 ("
+    //    "id_mapping INTEGER PRIMARY KEY NOT NULL,"
+    //    "id_database_from TEXT NOT NULL COLLATE NOCASE,"
+    //    "id_feature_from INTEGER NOT NULL,"
+    //    "id_database_to TEXT NOT NULL COLLATE NOCASE,"
+    //    "id_feature_to INTEGER NOT NULL,"
+    //    ""
+    //    "CONSTRAINT unique_mapping "
+    //    "UNIQUE(id_database_from, id_feature_from, id_database_to,
+    //    id_feature_to),"
+    //    ""
+    //    "CONSTRAINT fk_MapGFF3_from "
+    //    "FOREIGN KEY (id_database_from, id_feature_from) "
+    //    "REFERENCES GFF3Features(id_database, id_feature),"
+    //    ""
+    //    "CONSTRAINT fk_MapGFF3_to "
+    //    "FOREIGN KEY (id_database_to, id_feature_to) "
+    //    "REFERENCES GFF3Features(id_database, id_feature)"
+    //    ")",
+    //    "CREATE INDEX idx_MapGFF3_from ON MapGFF3(id_database_from, "
+    //    "id_feature_from)",
+    //    "CREATE INDEX idx_MapGFF3_to ON MapGFF3(id_database_to,
+    //    id_feature_to)",
+
+};
+
+inline static QStringList MGIMap{
+    "DROP TABLE IF EXISTS MGIMap",
+    "CREATE TABLE MGIMap ("
+    "id_mgi INTEGER NOT NULL COLLATE NOCASE, "
+    "id_feature INTEGER NOT NULL, "
+    ""
+    "PRIMARY KEY (id_mgi, id_feature),"
+    ""
+    "CONSTRAINT fk_MGIMap_feature "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures (id_database, id_feature)"
+    ")",
+
+    "CREATE INDEX MGIMap_id_feature ON MGIMap(id_feature)",
+};
+
 }  // namespace Schemas
 
 using namespace Execute;
@@ -239,4 +308,5 @@ void init_main(QSqlDatabase db);
 void init_taxon(QSqlDatabase db, QString taxons = {});
 void init_genomic_features(QSqlDatabase db);
 void init_genomic_sequences(QSqlDatabase db);
+void init_uniprot_map(QSqlDatabase db);
 }  // namespace DOGIToys::Initiate

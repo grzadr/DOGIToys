@@ -19,7 +19,8 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       .def(py::init<const string&, const string&>(), "path"_a, "config"_a = "")
       .def("open", py::overload_cast<const string&, bool>(&DOGI::open),
            "path"_a, "create"_a = false)
-      .def("close", &DOGI::close, "optimize"_a = false)
+      .def("close", &DOGI::close, "integrity_check"_a = false,
+           "optimize"_a = false)
       .def("destroy", &DOGI::destroy, "confirm"_a = false)
 
       .def("clear_taxon", &DOGI::clear_taxon)
@@ -30,14 +31,19 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       .def("setTaxon", py::overload_cast<>(&DOGI::setTaxon))
       .def("setTaxon", py::overload_cast<int, bool>(&DOGI::setTaxon),
            "id_taxon"_a, "overwrite"_a = false)
-      .def("setTaxon", py::overload_cast<string>(&DOGI::setTaxon), "name"_a)
+      .def("setTaxon", py::overload_cast<string, bool>(&DOGI::setTaxon),
+           "name"_a, "overwrite"_a = false)
 
       .def("populateGenomicFeatures",
            py::overload_cast<string, bool>(&DOGI::populateGenomicFeatures),
-           "gff3_file"_a, "initiate"_a = false)
+           "gff3_file"_a, "initiate"_a = true)
 
       .def("populateGenomicSequences",
            py::overload_cast<string, string, bool>(
                &DOGI::populateGenomicSequences),
-           "fasta_file"_a, "masking"_a, "overwrite"_a = false);
+           "fasta_file"_a, "masking"_a, "overwrite"_a = false)
+
+      .def("populateUniprotMap",
+           py::overload_cast<string, bool>(&DOGI::populateUniprotMap),
+           "map_file"_a, "overwrite"_a = true);
 }
