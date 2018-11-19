@@ -8,27 +8,13 @@
 #include <QVector>
 
 #include <exception>
-#include <memory>
 
 #include <iostream>
 
-#include "dogitoys-file.h"
-#include "dogitoys-tools.h"
-
-using std::cout;
-using std::endl;
-
-using std::make_unique;
-using std::runtime_error;
-using std::unique_ptr;
-
-using qvec_int = QVector<int>;
-using qvec_pair_int = QVector<QPair<int, int>>;
-
 namespace DOGIToys {
 
-class DOGIGOTerm {
-private:
+class GeneOntologyTerm {
+ private:
   int id{0};
   int replaced_by{0};
   bool is_obsolete{false};
@@ -36,9 +22,7 @@ private:
   QStringList synonyms{};
   QVector<int> is_a{}, consider{}, intersection_of{}, relationship{}, alt_id{};
 
-public:
-  DOGIGOTerm() = default;
-
+ public:
   static int extractID(const QString &id) {
     return id.mid(id.indexOf(":") + 1).toInt();
   }
@@ -92,10 +76,10 @@ public:
 };
 
 class DOGIGOParser {
-private:
+ private:
   unique_ptr<DOGIFile> file{nullptr};
 
-public:
+ public:
   QVector<DOGIGOTerm> parse();
 
   void setFile(const QString &file_name);
@@ -121,6 +105,6 @@ void insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a = 0);
 void insertGOAnnotation(const QSqlDatabase &db, const QString &id_database,
                         int id_feature, int id_go);
 
-} // namespace DOGIGO
+}  // namespace DOGIGO
 
-} // namespace DOGIToys
+}  // namespace DOGIToys

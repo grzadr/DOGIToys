@@ -13,8 +13,7 @@ void DOGIGOTerm::setID(const QString &id) {
 }
 
 void DOGIGOTerm::setName(const QString &name) {
-  if (!this->name.isEmpty())
-    throw runtime_error("Name already initialized");
+  if (!this->name.isEmpty()) throw runtime_error("Name already initialized");
   this->name = name;
 }
 
@@ -25,8 +24,7 @@ void DOGIGOTerm::setNamespace(const QString &names) {
 }
 
 void DOGIGOTerm::setDef(const QString &def) {
-  if (!this->def.isEmpty())
-    throw runtime_error("Def already initialized");
+  if (!this->def.isEmpty()) throw runtime_error("Def already initialized");
   this->def = def;
 }
 
@@ -62,8 +60,7 @@ void DOGIGOTerm::addRelationship(const QString &relationship) {
 }
 
 void DOGIGOTerm::setReplacedBy(const QString &replaced_by) {
-  if (this->replaced_by != 0)
-    throw runtime_error("ID already initialized");
+  if (this->replaced_by != 0) throw runtime_error("ID already initialized");
   this->replaced_by = extractID(replaced_by);
 }
 
@@ -81,7 +78,6 @@ QVector<DOGIGOTerm> DOGIGOParser::parse() {
   auto term = DOGIGOTerm();
 
   while (file->readLineInto()) {
-
     const auto &field = file->line.left(file->line.indexOf(':'));
     const auto &value = file->line.mid(file->line.indexOf(':') + 2);
 
@@ -146,11 +142,12 @@ void DOGIGO::insertGOTerm(const QSqlDatabase &db, int id_go,
                           bool go_is_obsolete, int go_id_master) {
   QSqlQuery query(db);
 
-  prepare(query, "INSERT INTO "
-                 "GOTerms (id_go, go_name, go_namespace, go_def, go_comment, "
-                 "go_is_obsolete, go_id_master) "
-                 "VALUES(:id_go, :go_name, :go_namespace, :go_def, "
-                 ":go_comment, :go_is_obsolete, :go_id_master)");
+  prepare(query,
+          "INSERT INTO "
+          "GOTerms (id_go, go_name, go_namespace, go_def, go_comment, "
+          "go_is_obsolete, go_id_master) "
+          "VALUES(:id_go, :go_name, :go_namespace, :go_def, "
+          ":go_comment, :go_is_obsolete, :go_id_master)");
 
   query.bindValue(":id_go", id_go);
   query.bindValue(":go_name", go_name);
@@ -180,7 +177,6 @@ void DOGIGO::insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a) {
 
 qvec_pair_int DOGIGO::insertGOTerm(const QSqlDatabase &db,
                                    const DOGIGOTerm &term) {
-
   for (const auto &id_go : term.getAltID())
     DOGIGO::insertGOTerm(db, id_go, term.getName(), term.getNamespace(),
                          term.getDef(), term.getComment(), term.isObsolete(),
@@ -200,9 +196,10 @@ void DOGIGO::insertGOAnnotation(const QSqlDatabase &db,
                                 int id_go) {
   QSqlQuery query(db);
 
-  prepare(query, "INSERT OR IGNORE INTO GOAnnotations "
-                 "(id_database, id_feature, id_go) "
-                 "VALUES (:id_database, :id_feature, :id_go)");
+  prepare(query,
+          "INSERT OR IGNORE INTO GOAnnotations "
+          "(id_database, id_feature, id_go) "
+          "VALUES (:id_database, :id_feature, :id_go)");
 
   query.bindValue(":id_database", id_database);
   query.bindValue(":id_feature", id_feature);

@@ -152,6 +152,12 @@ inline int select_id(const QSqlDatabase &db, const QString &table,
   else
     return select.value(0).toInt();
 }
+
+inline int select_id_feature_from_stable_id(const QSqlDatabase &db,
+                                            const QString &feature_stable_id) {
+  return select_id(db, "GenomicFeatures", "id_feature", "feature_stable_id",
+                   feature_stable_id);
+}
 }  // namespace Select
 
 namespace Update {

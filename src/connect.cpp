@@ -87,7 +87,7 @@ void DOGI::setTaxon(int id_taxon, bool overwrite = false) {
   auto taxon_name = Select::select_taxon_name(*db, id_taxon);
 
   if (const auto selected_id_taxon = Select::select_id_taxon(*db)) {
-    if (overwrite && *selected_id_taxon != id_taxon)
+    if (overwrite)
       Update::update_id_taxon(*db, id_taxon);
     else
       throw_runerror("Passed id_taxon deffers from id_taxon in DOGIMaster.");
@@ -113,4 +113,8 @@ void DOGI::populateGenomicSequences(QString fasta_file, QString masking,
 
 void DOGI::populateUniprotMap(QString map_file, bool overwrite) {
   populator.populateUniprotMap(map_file, overwrite);
+}
+
+void DOGI::populateGeneOntologyTerms(const QString obo_file, bool overwrite) {
+  populator.populateGeneOntologyTerms(obo_file, overwrite);
 }

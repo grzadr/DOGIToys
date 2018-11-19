@@ -300,13 +300,88 @@ inline static QStringList MGIMap{
     "CREATE INDEX MGIMap_id_feature ON MGIMap(id_feature)",
 };
 
+inline static QStringList GeneOntology{
+    "DROP VIEW IF EXISTS GeneOntologySlaves;",
+    "DROP TABLE IF EXISTS GeneOntologyAnnotations;",
+    "DROP TABLE IF EXISTS GeneOntologyHierarchy;",
+    "DROP TABLE IF EXISTS GeneOntologyTerms;",
+
+    "CREATE TABLE GeneOntologyTerms ("
+    "id_go INTEGER PRIMARY KEY NOT NULL, "
+    "go_name TEXT NOT NULL COLLATE NOCASE, "
+    "go_namespace TEXT NOT NULL COLLATE NOCASE, "
+    "go_def TEXT NOT NULL COLLATE NOCASE, "
+    "go_comment TEXT DEFAULT NULL COLLATE NOCASE, "
+    "go_is_obsolete BOOLEAN NOT NULL DEFAULT FALSE, "
+    "go_id_master INTEGER DEFAULT NULL, "
+    ""
+    "CONSTRAINT fk_GeneOntologyTerms_id_master "
+    "FOREIGN KEY (go_id_master) "
+    "REFERENCES GeneOntologyTerms(id_go) "
+    "ON DELETE CASCADE "
+    ")",
+
+    "CREATE INDEX idx_GeneOntologyTerms_namespace ON "
+    "GeneOntologyTerms(go_namespace)",
+
+    "CREATE TABLE GeneOntologyHierarchy ("
+    "id_go INTEGER NOT NULL,"
+    "go_is_a INTEGER DEFAULT NULL,"
+    ""
+    "PRIMARY KEY (id_go, go_is_a),"
+    ""
+    "CONSTRAINT fk_id_go "
+    "FOREIGN KEY (id_go) "
+    "REFERENCES GeneOntologyTerms(id_go) "
+    "ON DELETE CASCADE,"
+    ""
+    "CONSTRAINT fk_go_is_a "
+    "FOREIGN KEY (go_is_a) "
+    "REFERENCES GeneOntologyTerms(id_go) "
+    "ON DELETE CASCADE"
+    ")",
+
+    "CREATE INDEX idx_GOHierarchy_go_is_a ON GeneOntologyHierarchy(go_is_a)",
+
+    "CREATE TABLE GeneOntologyAnnotations("
+    "id_feature INTEGER NOT NULL, "
+    "id_go INTEGER NOT NULL, "
+    ""
+    "PRIMARY KEY (id_feature, id_go), "
+    ""
+    "CONSTRAINT fk_GeneOntologyAnnotations_id_feature "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures(id_feature) "
+    "ON DELETE CASCADE, "
+    ""
+    "CONSTRAINT fk_GeneOntologyAnnotations_id_go "
+    "FOREIGN KEY (id_go) "
+    "REFERENCES GeneOntologyTerms(id_go) "
+    "ON DELETE CASCADE"
+    ")",
+
+    "CREATE VIEW GeneOntologySlaves AS "
+    "SELECT "
+    "HM.id_go AS id_go, "
+    "HS.id_go AS go_id_slave "
+    "FROM GeneOntologyTerms HM CROSS JOIN GeneOntologyTerms HS "
+    "WHERE HS.id_go IN"
+    "(WITH RECURSIVE GeneOntologySlave(go_slave) AS ("
+    "VALUES(HM.id_go) "
+    "UNION ALL "
+    "SELECT id_go FROM GeneOntologyHierarchy, GOSlave "
+    "WHERE go_is_a = GeneOntologySLave.go_slave "
+    ") SELECT * FROM GeneOntologySlave)",
+};
+
 }  // namespace Schemas
 
 using namespace Execute;
 
-void init_main(QSqlDatabase db);
-void init_taxon(QSqlDatabase db, QString taxons = {});
-void init_genomic_features(QSqlDatabase db);
-void init_genomic_sequences(QSqlDatabase db);
-void init_uniprot_map(QSqlDatabase db);
+void init_main(QSqlDatabase &db);
+void init_taxon(QSqlDatabase &db, QString taxons = {});
+void init_genomic_features(QSqlDatabase &db);
+void init_genomic_sequences(QSqlDatabase &db);
+void init_uniprot_map(QSqlDatabase &db);
+void init_gene_ontology(QSqlDatabase &db);
 }  // namespace DOGIToys::Initiate

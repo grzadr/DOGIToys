@@ -45,5 +45,9 @@ PYBIND11_MODULE(pyDOGIToys, m) {
 
       .def("populateUniprotMap",
            py::overload_cast<string, bool>(&DOGI::populateUniprotMap),
-           "map_file"_a, "overwrite"_a = true);
+           "map_file"_a, "overwrite"_a = true)
+
+      .def("populateGeneOntologyTerms",
+           py::overload_cast<string, bool>(&DOGI::populateGeneOntologyTerms),
+           "obo_file"_a, "overwrite"_a = true);
 }

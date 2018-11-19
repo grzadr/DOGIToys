@@ -35,14 +35,14 @@ class Populator {
   void initGenomicFeatures();
   void initGenomicSequences();
   void initUniprotMap();
+  void initGeneOntology();
 
   void populateGenomicFeatures(QString gff3_file, bool initiate);
-
   void populateGenomicSequences(QString fasta_file, QString masking,
                                 bool initiate);
   void insertGenomicSequence(const HKL::RegionSeq &seq, const QString masking);
-
   void populateUniprotMap(const QString map_file, bool overwrite);
+  void populateGeneOntologyTerms(const QString obo_file, bool overwrite);
 };
 
 }  // namespace DOGIToys::Populate

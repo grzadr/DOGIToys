@@ -17,9 +17,9 @@ class UniprotMapRecord {
   QString xref;
   QString db_name;
   QString info_type;
-  QString source_identity;
-  QString xref_identity;
-  QString linkage_type;
+  QVariant source_identity;
+  QVariant xref_identity;
+  QVariant linkage_type;
 
  public:
   UniprotMapRecord() = delete;

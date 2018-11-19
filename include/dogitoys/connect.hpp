@@ -140,6 +140,11 @@ class DOGI {
   void populateUniprotMap(string map_file, bool overwrite = true) {
     populateUniprotMap(QString::fromStdString(map_file), overwrite);
   }
+
+  void populateGeneOntologyTerms(const QString obo_file, bool overwrite);
+  void populateGeneOntologyTerms(const string obo_file, bool overwrite) {
+    populateGeneOntologyTerms(QString::fromStdString(obo_file), overwrite);
+  }
 };
 
 }  // namespace DOGIToys

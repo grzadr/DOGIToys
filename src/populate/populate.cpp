@@ -24,6 +24,10 @@ void DOGIToys::Populate::Populator::initUniprotMap() {
   Initiate::init_uniprot_map(*db);
 }
 
+void DOGIToys::Populate::Populator::initGeneOntology() {
+  Initiate::init_gene_ontology(*db);
+}
+
 void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
                                                             bool initiate) {
   qInfo() << "Populating Genomic Features";
@@ -108,6 +112,17 @@ void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
   }
 
   qInfo() << "Commiting";
+
+  Transaction::commit(*db);
+}
+
+void DOGIToys::Populate::Populator::populateGeneOntologyTerms(
+    const QString obo_file, bool overwrite) {
+  if (overwrite || !db->tables().contains("GeneOntologyTerms"))
+    initGeneOntology();
+
+  qInfo() << "Populating Uniprot Mappings";
+  Transaction::transaction(*db);
 
   Transaction::commit(*db);
 }
