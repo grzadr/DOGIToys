@@ -121,8 +121,10 @@ void DOGIToys::Populate::Populator::populateGeneOntologyTerms(
   if (overwrite || !db->tables().contains("GeneOntologyTerms"))
     initGeneOntology();
 
-  qInfo() << "Populating Uniprot Mappings";
+  qInfo() << "Populating GeneOntology Terms";
   Transaction::transaction(*db);
+
+  GeneOntology::OBOParser obo_parser(obo_file);
 
   Transaction::commit(*db);
 }

@@ -52,7 +52,7 @@ def main():
                       "Homo_sapiens.GRCh38.94.gff3")
         uniprot_map = ("/Dropbox/DOGI/Sources/Ensembl/94/Mapping/homo_sapiens/"
                        "Homo_sapiens.GRCh38.94.uniprot.tsv")
-        gene_ontology_terms = "/cloud/Dropbox/Dropbox/DOGI/Sources/GeneOntology/go.obo"
+        gene_ontology_terms = "/Dropbox/DOGI/Sources/GeneOntology/go.obo"
 
     if test or initiate:
         db.populateGenomicFeatures(annotation, True)

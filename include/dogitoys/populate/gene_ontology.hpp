@@ -8,10 +8,16 @@
 #include <QVector>
 
 #include <exception>
-
 #include <iostream>
+#include <optional>
 
-namespace DOGIToys {
+#include <dogitoys/tools.hpp>
+
+#include <agizmo/files.hpp>
+
+namespace DOGIToys::GeneOntology {
+
+using qvec_int = QVector<int>;
 
 class GeneOntologyTerm {
  private:
@@ -20,7 +26,7 @@ class GeneOntologyTerm {
   bool is_obsolete{false};
   QString name{}, names{}, def{}, comment{};
   QStringList synonyms{};
-  QVector<int> is_a{}, consider{}, intersection_of{}, relationship{}, alt_id{};
+  qvec_int is_a{}, consider{}, intersection_of{}, relationship{}, alt_id{};
 
  public:
   static int extractID(const QString &id) {
@@ -72,39 +78,40 @@ class GeneOntologyTerm {
 
   void addAltID(const QString &alt_id);
 
-  const QVector<int> &getAltID() const { return alt_id; }
+  const qvec_int &getAltID() const { return alt_id; }
 };
 
-class DOGIGOParser {
+class OBOParser {
  private:
-  unique_ptr<DOGIFile> file{nullptr};
+  AGizmo::Files::FileReader reader;
 
  public:
-  QVector<DOGIGOTerm> parse();
+  //  QVector<DOGIGOTerm> parse();
 
-  void setFile(const QString &file_name);
+  OBOParser() = delete;
 
-  DOGIGOParser() = delete;
+  OBOParser(const QString &file_name) : reader{file_name.toStdString()} {}
 
-  DOGIGOParser(const QString &file_name) { setFile(file_name); }
+  ~OBOParser() = default;
 
-  ~DOGIGOParser() = default;
+  std::optional<GeneOntologyTerm> parse();
+  std::optional<GeneOntologyTerm> operator()();
 };
 
 namespace DOGIGO {
 
-void insertGOTerm(const QSqlDatabase &db, int id_go, const QString &go_name,
-                  const QString &go_namespace, const QString &go_def,
-                  const QString &go_comment, bool go_is_obsolete,
-                  int go_id_master);
+// void insertGOTerm(const QSqlDatabase &db, int id_go, const QString &go_name,
+//                  const QString &go_namespace, const QString &go_def,
+//                  const QString &go_comment, bool go_is_obsolete,
+//                  int go_id_master);
 
-qvec_pair_int insertGOTerm(const QSqlDatabase &db, const DOGIGOTerm &term);
+// qvec_pair_int insertGOTerm(const QSqlDatabase &db, const DOGIGOTerm &term);
 
-void insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a = 0);
+// void insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a = 0);
 
-void insertGOAnnotation(const QSqlDatabase &db, const QString &id_database,
-                        int id_feature, int id_go);
+// void insertGOAnnotation(const QSqlDatabase &db, const QString &id_database,
+//                        int id_feature, int id_go);
 
 }  // namespace DOGIGO
 
-}  // namespace DOGIToys
+}  // namespace DOGIToys::GeneOntology

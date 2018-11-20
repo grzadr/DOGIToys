@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <dogitoys/initiate.hpp>
+#include <dogitoys/populate/gene_ontology.hpp>
 #include <dogitoys/populate/genomic_features.hpp>
 #include <dogitoys/populate/mapping.hpp>
 #include <dogitoys/query.hpp>

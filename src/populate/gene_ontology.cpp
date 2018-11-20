@@ -1,81 +1,76 @@
-#include "dogitoys-go.h"
+#include <dogitoys/populate/gene_ontology.hpp>
 
-using namespace DOGIToys;
-using namespace DOGITools;
+using namespace DOGIToys::GeneOntology;
 
-void DOGIGOTerm::setID(const QString &id) {
+void GeneOntologyTerm::setID(const QString &id) {
   if (const auto temp = extractID(id); this->id != 0)
-    throw runtime_error("ID already initialized");
+    throw_runerror("ID already initialized");
   else {
     this->id = temp;
     this->alt_id.append(temp);
   }
 }
 
-void DOGIGOTerm::setName(const QString &name) {
-  if (!this->name.isEmpty()) throw runtime_error("Name already initialized");
+void GeneOntologyTerm::setName(const QString &name) {
+  if (!this->name.isEmpty()) throw throw_runerror("Name already initialized");
   this->name = name;
 }
 
-void DOGIGOTerm::setNamespace(const QString &names) {
-  if (!this->names.isEmpty())
-    throw runtime_error("Namespace already initialized");
+void GeneOntologyTerm::setNamespace(const QString &names) {
+  if (!this->names.isEmpty()) throw_runerror("Namespace already initialized");
   this->names = names;
 }
 
-void DOGIGOTerm::setDef(const QString &def) {
-  if (!this->def.isEmpty()) throw runtime_error("Def already initialized");
+void GeneOntologyTerm::setDef(const QString &def) {
+  if (!this->def.isEmpty()) throw_runerror("Def already initialized");
   this->def = def;
 }
 
-void DOGIGOTerm::addSynonym(const QString &synonym) {
+void GeneOntologyTerm::addSynonym(const QString &synonym) {
   this->synonyms.append(synonym);
 }
 
-void DOGIGOTerm::addIsA(const QString &is_a) {
+void GeneOntologyTerm::addIsA(const QString &is_a) {
   this->is_a.append(extractID(is_a, '!'));
 }
 
-void DOGIGOTerm::setIsObsolete(const QString &obsolete) {
+void GeneOntologyTerm::setIsObsolete(const QString &obsolete) {
   this->is_obsolete = obsolete == "true" ? true : false;
 }
 
-void DOGIGOTerm::setComment(const QString &comment) {
-  if (!this->comment.isEmpty())
-    throw runtime_error("Comment already initialized");
+void GeneOntologyTerm::setComment(const QString &comment) {
+  if (!this->comment.isEmpty()) throw_runerror("Comment already initialized");
 
   this->comment = comment;
 }
 
-void DOGIGOTerm::addConsider(const QString &consider) {
+void GeneOntologyTerm::addConsider(const QString &consider) {
   this->consider.append(extractID(consider));
 }
 
-void DOGIGOTerm::addIntersectionOf(const QString &intersection_of) {
+void GeneOntologyTerm::addIntersectionOf(const QString &intersection_of) {
   this->intersection_of.append(extractID(intersection_of, '!'));
 }
 
-void DOGIGOTerm::addRelationship(const QString &relationship) {
+void GeneOntologyTerm::addRelationship(const QString &relationship) {
   this->relationship.append(extractID(relationship, '!'));
 }
 
-void DOGIGOTerm::setReplacedBy(const QString &replaced_by) {
-  if (this->replaced_by != 0) throw runtime_error("ID already initialized");
+void GeneOntologyTerm::setReplacedBy(const QString &replaced_by) {
+  if (this->replaced_by != 0) throw_runerror("ID already initialized");
   this->replaced_by = extractID(replaced_by);
 }
 
-void DOGIGOTerm::addAltID(const QString &alt_id) {
+void GeneOntologyTerm::addAltID(const QString &alt_id) {
   this->alt_id.append(extractID(alt_id));
 }
 
-QVector<DOGIGOTerm> DOGIGOParser::parse() {
-  QVector<DOGIGOTerm> result{};
-
+std::optional<GeneOntologyTerm> OBOParser::parse() {
   do {
     file->readLineInto();
   } while (file->line != "[Term]");
 
-  auto term = DOGIGOTerm();
+  auto term = GeneOntologyTerm();
 
   while (file->readLineInto()) {
     const auto &field = file->line.left(file->line.indexOf(':'));
@@ -84,7 +79,7 @@ QVector<DOGIGOTerm> DOGIGOParser::parse() {
     if (file->line.isEmpty())
       result.append(term);
     else if (field == "[Term]")
-      term = DOGIGOTerm();
+      term = GeneOntologyTerm();
     else if (field == "id")
       term.setID(value);
     else if (field == "name")
@@ -176,7 +171,7 @@ void DOGIGO::insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a) {
 }
 
 qvec_pair_int DOGIGO::insertGOTerm(const QSqlDatabase &db,
-                                   const DOGIGOTerm &term) {
+                                   const GeneOntologyTerm &term) {
   for (const auto &id_go : term.getAltID())
     DOGIGO::insertGOTerm(db, id_go, term.getName(), term.getNamespace(),
                          term.getDef(), term.getComment(), term.isObsolete(),
