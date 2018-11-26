@@ -41,30 +41,30 @@ void DOGIToys::Populate::GenomicFeature::insert_feature() {
                                  ":name, :biotype)");
 
   insert.bindValue(":id_feature", id_feature);
-  insert.bindValue(":seqid", QString::fromStdString(*record.get_seqid()));
+  insert.bindValue(":seqid", QString::fromStdString(*record.getSeqID()));
 
-  if (const auto source = record.get_source())
+  if (const auto source = record.getSource())
     insert.bindValue(":source", QString::fromStdString(*source));
   else
     insert.bindValue(":source", QVariant(QVariant::String));
 
-  insert.bindValue(":type", QString::fromStdString(*record.get_type()));
-  insert.bindValue(":start", record.get_start());
-  insert.bindValue(":end", record.get_end());
-  insert.bindValue(":length", static_cast<int>(record.get_length()));
+  insert.bindValue(":type", QString::fromStdString(*record.getType()));
+  insert.bindValue(":start", record.getStart());
+  insert.bindValue(":end", record.getEnd());
+  insert.bindValue(":length", static_cast<int>(record.getLength()));
 
-  if (const auto score = record.get_score())
+  if (const auto score = record.getScore())
     insert.bindValue(":score", *score);
   else
     insert.bindValue(":score", QVariant(QVariant::Double));
 
-  if (const auto strand = record.get_strand())
+  if (const auto strand = record.getStrand())
     insert.bindValue(":strand",
                      QString::fromStdString(std::string(1, *strand)));
   else
     insert.bindValue(":strand", QVariant(QVariant::String));
 
-  if (const auto phase = record.get_phase())
+  if (const auto phase = record.getPhase())
     insert.bindValue(":phase", *phase);
   else
     insert.bindValue(":phase", QVariant(QVariant::Int));
@@ -88,11 +88,11 @@ void DOGIToys::Populate::GenomicFeature::insert_feature() {
           QString::fromStdString((*signature).value().substr(found + 1)));
     else
       insert.bindValue(":stable_id", QVariant(QVariant::String));
-  } else if (const auto &type = record.get_type().value();
+  } else if (const auto &type = record.getType().value();
              type == "chromosome" or type == "region" or type == "contig" or
              type == "supercontig") {
-    insert.bindValue(":signature", QString::fromStdString(*record.get_seqid()));
-    insert.bindValue(":stable_id", QString::fromStdString(*record.get_seqid()));
+    insert.bindValue(":signature", QString::fromStdString(*record.getSeqID()));
+    insert.bindValue(":stable_id", QString::fromStdString(*record.getSeqID()));
   } else {
     insert.bindValue(":signature", QVariant(QVariant::String));
     insert.bindValue(":stable_id", QVariant(QVariant::String));

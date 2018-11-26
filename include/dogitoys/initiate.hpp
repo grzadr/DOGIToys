@@ -83,7 +83,9 @@ inline static QStringList SeqIDs{
     ")",
 };
 
-inline static QString GFFBasic{
+inline static QStringList GenomicFeatures{
+    "DROP TABLE IF EXISTS GenomicFeatures",
+    "CREATE TABLE GenomicFeatures("
     "id_feature INTEGER PRIMARY KEY NOT NULL,"
     "feature_seqid TEXT NOT NULL COLLATE NOCASE,"
     "feature_source TEXT COLLATE NOCASE,"
@@ -95,49 +97,45 @@ inline static QString GFFBasic{
     "feature_strand COLLATE NOCASE,"
     "feature_phase INT,"
     "feature_id_parent INTEGER,"
-    "feature_signature TEXT COLLATE NOCASE,"};
+    "feature_signature TEXT COLLATE NOCASE,"
+    "feature_stable_id TEXT COLLATE NOCASE,"
+    "feature_name TEXT COLLATE NOCASE,"
+    "feature_biotype TEXT COLLATE NOCASE,"
+    ""
+    "CONSTRAINT typeof_id_parent "
+    "CHECK(feature_id_parent IS NULL OR TYPEOF(feature_id_parent) = "
+    "'integer'),"
+    "CONSTRAINT typeof_start "
+    "CHECK(TYPEOF(feature_start) = 'integer'),"
+    "CONSTRAINT typeof_end "
+    "CHECK(TYPEOF(feature_end) = 'integer'),"
+    "CONSTRAINT typeof_length "
+    "CHECK(TYPEOF(feature_length) = 'integer'),"
+    ""
+    "CONSTRAINT length_type CHECK(LENGTH(feature_type)),"
+    "CONSTRAINT length_signature "
+    "CHECK(feature_signature IS NULL OR LENGTH(feature_signature)),"
+    "CONSTRAINT length_name "
+    "CHECK(feature_name IS NULL OR LENGTH(feature_name)),"
+    "CONSTRAINT length_biotype "
+    "CHECK(feature_biotype IS NULL OR LENGTH(feature_biotype)),"
 
-inline static QStringList GenomicFeatures{
-    "DROP TABLE IF EXISTS GenomicFeatures",
-    "CREATE TABLE GenomicFeatures(" + GFFBasic +
-        "feature_stable_id TEXT COLLATE NOCASE,"
-        "feature_name TEXT COLLATE NOCASE,"
-        "feature_biotype TEXT COLLATE NOCASE,"
-        ""
-        "CONSTRAINT typeof_id_parent "
-        "CHECK(feature_id_parent IS NULL OR TYPEOF(feature_id_parent) = "
-        "'integer'),"
-        "CONSTRAINT typeof_start "
-        "CHECK(TYPEOF(feature_start) = 'integer'),"
-        "CONSTRAINT typeof_end "
-        "CHECK(TYPEOF(feature_end) = 'integer'),"
-        "CONSTRAINT typeof_length "
-        "CHECK(TYPEOF(feature_length) = 'integer'),"
-        ""
-        "CONSTRAINT length_type CHECK(LENGTH(feature_type)),"
-        "CONSTRAINT length_signature "
-        "CHECK(feature_signature IS NULL OR LENGTH(feature_signature)),"
-        "CONSTRAINT length_name "
-        "CHECK(feature_name IS NULL OR LENGTH(feature_name)),"
-        "CONSTRAINT length_biotype "
-        "CHECK(feature_biotype IS NULL OR LENGTH(feature_biotype)),"
-
-        "CONSTRAINT value_start CHECK(feature_start > 0),"
-        "CONSTRAINT value_end CHECK(feature_end >= feature_start),"
-        "CONSTRAINT value_strand "
-        "CHECK(feature_strand IS NULL OR feature_strand IN ('+', '-')),"
-        ""
-        "CONSTRAINT fk_GenomicAnnotation_seqid "
-        "FOREIGN KEY (feature_seqid) "
-        "REFERENCES SeqIDs (seqid_name) "
-        "ON DELETE CASCADE,"
-        ""
-        "CONSTRAINT fk_Features_id_parent "
-        "FOREIGN KEY (feature_id_parent) "
-        "REFERENCES GenomicFeatures (id_feature) "
-        "ON DELETE CASCADE"
-        ""
-        ")",
+    "CONSTRAINT value_start CHECK(feature_start > 0),"
+    "CONSTRAINT value_end CHECK(feature_end >= feature_start),"
+    "CONSTRAINT value_strand "
+    "CHECK(feature_strand IS NULL OR feature_strand IN ('+', '-')),"
+    ""
+    "CONSTRAINT fk_GenomicAnnotation_seqid "
+    "FOREIGN KEY (feature_seqid) "
+    "REFERENCES SeqIDs (seqid_name) "
+    "ON DELETE CASCADE,"
+    ""
+    "CONSTRAINT fk_Features_id_parent "
+    "FOREIGN KEY (feature_id_parent) "
+    "REFERENCES GenomicFeatures (id_feature) "
+    "ON DELETE CASCADE"
+    ""
+    ")",
 
     "CREATE INDEX idx_GenomicFeatures_seqid ON "
     "GenomicFeatures(feature_seqid)",
@@ -360,6 +358,59 @@ inline static QStringList GeneOntologyAnnotation{
     "CREATE INDEX idx_GeneOntologyAnnotation_id_go ON "
     "GeneOntologyAnnotation(id_go)",
 };
+
+inline static QStringList StructuralVariants{
+    "DROP TABLE IF EXISTS StructuralVariants",
+
+    "id_struct INTEGER PRIMARY KEY NOT NULL,"
+    "struct_seqid TEXT NOT NULL COLLATE NOCASE,"
+    "struct_source TEXT COLLATE NOCASE,"
+    "struct_type TEXT NOT NULL COLLATE NOCASE,"
+    "struct_start INT NOT NULL,"
+    "struct_end INT NOT NULL,"
+    "struct_length INTEGER NOT NULL,"
+    "struct_strand COLLATE NOCASE,"
+    "struct_id_parent INTEGER DEFAULT NULL,"
+    "struct_parent_signature TEXT DEFAULT NULL COLLATE NOCASE,"
+    "struct_signature TEXT COLLATE NOCASE,"
+    "struct_study TEXT COLLATE NOCASE,"
+    "struct_start_range_start INTEGER DEFAULT NULL,"
+    "struct_start_range_end INTEGER DEFAULT NULL,"
+    "struct_end_range_start INTEGER DEFAULT NULL,"
+    "struct_end_range_end INTEGER DEFAULT NULL,"
+    ""
+    "CONSTRAINT typeof_id_parent "
+    "CHECK(struct_id_parent IS NULL OR TYPEOF(struct_id_parent) = "
+    "'integer'),"
+    "CONSTRAINT typeof_start "
+    "CHECK(TYPEOF(struct_start) = 'integer'),"
+    "CONSTRAINT typeof_end "
+    "CHECK(TYPEOF(struct_end) = 'integer'),"
+    "CONSTRAINT typeof_length "
+    "CHECK(TYPEOF(struct_length) = 'integer'),"
+    ""
+    "CONSTRAINT length_type CHECK(LENGTH(struct_type)),"
+    "CONSTRAINT length_signature "
+    "CHECK(struct_signature IS NULL OR LENGTH(struct_signature)),"
+
+    "CONSTRAINT value_start CHECK(struct_start > 0),"
+    "CONSTRAINT value_end CHECK(struct_end >= struct_start),"
+    "CONSTRAINT value_strand "
+    "CHECK(struct_strand IS NULL OR struct_strand IN ('+', '-')),"
+    ""
+    "CONSTRAINT fk_StructuralVariants_seqid "
+    "FOREIGN KEY (struct_seqid) "
+    "REFERENCES SeqIDs (seqid_name) "
+    "ON DELETE CASCADE,"
+    ""
+    "CONSTRAINT fk_Features_id_parent "
+    "FOREIGN KEY (struct_id_parent) "
+    "REFERENCES StructuralVariants (id_struct) "
+    "ON DELETE CASCADE"
+    ""
+    ")",
+
+};  // namespace Schemas
 
 }  // namespace Schemas
 

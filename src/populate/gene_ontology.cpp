@@ -198,6 +198,7 @@ void GAFRecord::insert(QSqlDatabase &db) const {
     for (const int id_feature :
          Select::select_id_feature_from_uniprot(db, uniprot_xref)) {
       insert.bindValue(":id_feature", id_feature);
+      Execute::exec(insert);
     }
   }
 }
