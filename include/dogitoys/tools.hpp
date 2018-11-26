@@ -6,15 +6,11 @@
 #include <QStringList>
 
 //#include <exception>
+#include <optional>
 #include <stdexcept>
 #include <string>
-//#include <sstream>
-//#include <string>
-//#include <vector>
 
-// using std::string;
-// using sstream = std::stringstream;
-// using vec_str = std::vector<string>;
+#include <agizmo/files.hpp>
 
 using runerror = std::runtime_error;
 
@@ -66,17 +62,78 @@ namespace DOGIToys {
 [[noreturn]] inline void throw_runerror(const std::string &message) {
   throw runerror{message};
 }
+using namespace AGizmo::Files;
+class QFileReader {
+ private:
+  FileReader reader;
+  QString line{};
 
-// inline QString chop(const QString &source, QChar terminator = '.') {
-//  return source.left(source.indexOf(terminator));
-//}
+ public:
+  QFileReader() = delete;
+  QFileReader(const QString &file_name) : reader{file_name.toStdString()} {}
 
-// inline int extractIntID(const QString &id) {
-//  return id.mid(id.indexOf(":") + 1).toInt();
-//}
+  ~QFileReader() { reader.close(); }
 
-// inline QString extractID(const QString &id) {
-//  return id.mid(id.indexOf(":") + 1);
-//}
+  bool good() const { return reader.good(); }
+
+  bool readLine(const QString &skip = {}) {
+    if (reader.readLine(skip.toStdString())) {
+      line = QString::fromStdString(reader.getLine());
+      return true;
+    } else
+      return false;
+  }
+
+  bool readLine(int skip) {
+    if (reader.readLine(skip)) {
+      line = QString::fromStdString(reader.getLine());
+      return true;
+    } else
+      return false;
+  }
+
+  bool setLineToMatch(const QString &match) {
+    do {
+      readLine();
+      if (line == match) return true;
+    } while (good());
+
+    return false;
+  }
+
+  std::optional<QString> operator()(const QString &skip = {}) {
+    if (readLine(skip))
+      return line;
+    else
+      return nullopt;
+  }
+
+  std::optional<QString> operator()(int skip) {
+    if (readLine(skip))
+      return line;
+    else
+      return nullopt;
+  }
+};
+
+inline QPair<QString, QString> get_field_value(const QString &source,
+                                               QChar separator,
+                                               const int spaces = 0) {
+  const auto sep_index = source.indexOf(separator);
+  QString field = source.left(sep_index);
+  QString value = source.mid(sep_index + 1 + spaces);
+
+  return {field, value};
+}
+
+inline QString extractID(const QString &id, const QChar separator) {
+  auto sep = id.indexOf(separator) + 1;
+  auto last = id.indexOf(' ', sep + 1) - sep;
+  return id.mid(sep, last);
+}
+
+inline int extractIntID(const QString &id, const QChar separator) {
+  return extractID(id, separator).toInt();
+}
 
 }  // namespace DOGIToys

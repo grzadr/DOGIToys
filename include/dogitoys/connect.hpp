@@ -57,8 +57,14 @@ class DOGI {
   void open_sqlite() { this->exec(sqlite_opening); }
   void close_sqlite(bool integrity_check = true, bool optimize = true) {
     exec(sqlite_closing);
-    if (integrity_check) exec(sqlite_integrity);
-    if (optimize) exec(sqlite_optimize);
+    if (integrity_check) {
+      qInfo() << "Checking DOGI integrity";
+      exec(sqlite_integrity);
+    }
+    if (optimize) {
+      qInfo() << "Optimizing DOGI";
+      exec(sqlite_optimize);
+    }
   }
 
  public:
@@ -140,10 +146,19 @@ class DOGI {
   void populateUniprotMap(string map_file, bool overwrite = true) {
     populateUniprotMap(QString::fromStdString(map_file), overwrite);
   }
+  void populateMGIMap(QString map_file, bool overwrite = true);
+  void populateMGIMap(string map_file, bool overwrite = true) {
+    populateMGIMap(QString::fromStdString(map_file), overwrite);
+  }
 
   void populateGeneOntologyTerms(const QString obo_file, bool overwrite);
   void populateGeneOntologyTerms(const string obo_file, bool overwrite) {
     populateGeneOntologyTerms(QString::fromStdString(obo_file), overwrite);
+  }
+
+  void populateGeneOntologyAnnotation(const QString gaf_file, bool overwrite);
+  void populateGeneOntologyAnnotation(const string gaf_file, bool overwrite) {
+    populateGeneOntologyAnnotation(QString::fromStdString(gaf_file), overwrite);
   }
 };
 

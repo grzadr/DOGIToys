@@ -115,6 +115,15 @@ void DOGI::populateUniprotMap(QString map_file, bool overwrite) {
   populator.populateUniprotMap(map_file, overwrite);
 }
 
+void DOGI::populateMGIMap(QString map_file, bool overwrite) {
+  populator.populateMGIMap(map_file, overwrite);
+}
+
 void DOGI::populateGeneOntologyTerms(const QString obo_file, bool overwrite) {
   populator.populateGeneOntologyTerms(obo_file, overwrite);
+}
+
+void DOGI::populateGeneOntologyAnnotation(const QString gaf_file,
+                                          bool overwrite) {
+  populator.populateGeneOntologyAnnotation(gaf_file, overwrite);
 }

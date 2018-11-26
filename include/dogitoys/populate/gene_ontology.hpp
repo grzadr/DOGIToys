@@ -11,9 +11,10 @@
 #include <iostream>
 #include <optional>
 
-#include <dogitoys/tools.hpp>
-
 #include <agizmo/files.hpp>
+
+#include <dogitoys/query.hpp>
+#include <dogitoys/tools.hpp>
 
 namespace DOGIToys::GeneOntology {
 
@@ -24,18 +25,20 @@ class GeneOntologyTerm {
   int id{0};
   int replaced_by{0};
   bool is_obsolete{false};
-  QString name{}, names{}, def{}, comment{};
+  QString name{};
+  QString names{};
+  QString def{};
+  QString comment{};
   QStringList synonyms{};
-  qvec_int is_a{}, consider{}, intersection_of{}, relationship{}, alt_id{};
+  qvec_int is_a{};
+  qvec_int consider{};
+  qvec_int intersection_of{};
+  qvec_int relationship{};
+  qvec_int alt_id{};
 
  public:
-  static int extractID(const QString &id) {
-    return id.mid(id.indexOf(":") + 1).toInt();
-  }
-
-  static int extractID(const QString &id, const QChar &before) {
-    return extractID(id.left(id.indexOf(before) - 1));
-  }
+  void parse(const QString &line);
+  void insert(QSqlDatabase &db);
 
   bool isObsolete() const { return is_obsolete; }
 
@@ -60,7 +63,7 @@ class GeneOntologyTerm {
   void addIsA(const QString &is_a);
 
   const qvec_int &getIsA() const { return is_a; }
-  bool hasSlaves() const { return !is_a.isEmpty(); }
+  bool hasParents() const { return !is_a.isEmpty(); }
 
   void setIsObsolete(const QString &obsolete);
 
@@ -83,35 +86,37 @@ class GeneOntologyTerm {
 
 class OBOParser {
  private:
-  AGizmo::Files::FileReader reader;
+  QFileReader reader;
 
  public:
   //  QVector<DOGIGOTerm> parse();
 
   OBOParser() = delete;
 
-  OBOParser(const QString &file_name) : reader{file_name.toStdString()} {}
+  OBOParser(const QString &obo_name) : reader{obo_name} {}
 
   ~OBOParser() = default;
 
-  std::optional<GeneOntologyTerm> parse();
-  std::optional<GeneOntologyTerm> operator()();
+  std::optional<GeneOntologyTerm> getTerm();
+  std::optional<GeneOntologyTerm> operator()() { return getTerm(); }
 };
 
-namespace DOGIGO {
+void insert_go_hierarchy(const QSqlDatabase &db, int id_go, int go_is_a);
 
-// void insertGOTerm(const QSqlDatabase &db, int id_go, const QString &go_name,
-//                  const QString &go_namespace, const QString &go_def,
-//                  const QString &go_comment, bool go_is_obsolete,
-//                  int go_id_master);
+class GAFRecord {
+ private:
+  QString uniprot_xref{};
+  int id_go;
+  bool from_mgi;
 
-// qvec_pair_int insertGOTerm(const QSqlDatabase &db, const DOGIGOTerm &term);
+ public:
+  GAFRecord() = delete;
+  GAFRecord(const QString &line, bool from_mgi);
 
-// void insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a = 0);
+  void insert(QSqlDatabase &db) const;
+};
 
 // void insertGOAnnotation(const QSqlDatabase &db, const QString &id_database,
 //                        int id_feature, int id_go);
-
-}  // namespace DOGIGO
 
 }  // namespace DOGIToys::GeneOntology

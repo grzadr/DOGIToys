@@ -56,7 +56,7 @@ void DOGIToys::Initiate::init_genomic_sequences(QSqlDatabase &db) {
   Transaction::commit(db);
 }
 
-void DOGIToys::Initiate::init_uniprot_map(QSqlDatabase &db) {
+void DOGIToys::Initiate::init_map_uniprot(QSqlDatabase &db) {
   qInfo() << "Initiating UniprotMap";
   Transaction::transaction(db);
   Execute::exec(db, Schemas::UniprotMap);
@@ -67,5 +67,12 @@ void DOGIToys::Initiate::init_gene_ontology(QSqlDatabase &db) {
   qInfo() << "Initiating GeneOntology";
   Transaction::transaction(db);
   Execute::exec(db, Schemas::GeneOntology);
+  Execute::exec(db, Schemas::GeneOntologyAnnotation);
+  Transaction::commit(db);
+}
+
+void DOGIToys::Initiate::init_map_mgi(QSqlDatabase &db) {
+  Transaction::transaction(db);
+  Execute::exec(db, Schemas::MGIMap);
   Transaction::commit(db);
 }

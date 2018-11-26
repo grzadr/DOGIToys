@@ -19,8 +19,8 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       .def(py::init<const string&, const string&>(), "path"_a, "config"_a = "")
       .def("open", py::overload_cast<const string&, bool>(&DOGI::open),
            "path"_a, "create"_a = false)
-      .def("close", &DOGI::close, "integrity_check"_a = false,
-           "optimize"_a = false)
+      .def("close", &DOGI::close, "integrity_check"_a = true,
+           "optimize"_a = true)
       .def("destroy", &DOGI::destroy, "confirm"_a = false)
 
       .def("clear_taxon", &DOGI::clear_taxon)
@@ -49,5 +49,10 @@ PYBIND11_MODULE(pyDOGIToys, m) {
 
       .def("populateGeneOntologyTerms",
            py::overload_cast<string, bool>(&DOGI::populateGeneOntologyTerms),
-           "obo_file"_a, "overwrite"_a = true);
+           "obo_file"_a, "overwrite"_a = true)
+
+      .def("populateGeneOntologyAnnotation",
+           py::overload_cast<string, bool>(
+               &DOGI::populateGeneOntologyAnnotation),
+           "gaf_file"_a, "overwrite"_a = true);
 }

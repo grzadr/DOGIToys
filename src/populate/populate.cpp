@@ -21,11 +21,25 @@ void DOGIToys::Populate::Populator::initGenomicSequences() {
 }
 
 void DOGIToys::Populate::Populator::initUniprotMap() {
-  Initiate::init_uniprot_map(*db);
+  Initiate::init_map_uniprot(*db);
+}
+
+void DOGIToys::Populate::Populator::initMGIMap() {
+  Initiate::init_map_mgi(*db);
 }
 
 void DOGIToys::Populate::Populator::initGeneOntology() {
   Initiate::init_gene_ontology(*db);
+}
+
+void DOGIToys::Populate::Populator::populateGeneOntologyHierarchy(
+    const QVector<QPair<int, int>> hierarchy) {
+  transaction();
+
+  for (const auto& [go_id, go_parent] : hierarchy)
+    GeneOntology::insert_go_hierarchy(*db, go_id, go_parent);
+
+  commit();
 }
 
 void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
@@ -100,7 +114,7 @@ void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
 
   if (overwrite || !db->tables().contains("UniprotMap")) initUniprotMap();
 
-  Transaction::transaction(*db);
+  transaction();
 
   AGizmo::Files::FileReader reader(map_file.toStdString());
 
@@ -113,18 +127,80 @@ void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
 
   qInfo() << "Commiting";
 
-  Transaction::commit(*db);
+  commit();
+}
+
+void DOGIToys::Populate::Populator::populateMGIMap(const QString map_file,
+                                                   bool overwrite) {
+  if (overwrite || !db->tables().contains("MGIMap")) initMGIMap();
+
+  QFileReader reader(map_file);
+  reader(1);
+
+  auto insert = Execute::prepare(*db,
+                                 "INSERT INTO "
+                                 "MGIMap (id_mgi, id_feature) "
+                                 "VALUES (:id_mgi, :id_feature)");
+
+  while (auto line = reader()) {
+    auto data = (*line).split("\t");
+    const auto id_mgi = extractID(data[1], ':');
+    if (const auto id_feature =
+            Select::select_id_feature_from_stable_id(*db, data[10]);
+        id_feature) {
+      insert.bindValue(":id_mgi", id_mgi);
+      insert.bindValue(":id_feature", id_feature);
+      Execute::exec(insert);
+    }
+  }
 }
 
 void DOGIToys::Populate::Populator::populateGeneOntologyTerms(
-    const QString obo_file, bool overwrite) {
+    const QString& obo_file, bool overwrite) {
   if (overwrite || !db->tables().contains("GeneOntologyTerms"))
     initGeneOntology();
 
   qInfo() << "Populating GeneOntology Terms";
-  Transaction::transaction(*db);
+  transaction();
 
   GeneOntology::OBOParser obo_parser(obo_file);
 
-  Transaction::commit(*db);
+  QVector<QPair<int, int>> hierarchy{};
+
+  while (auto term = obo_parser.getTerm()) {
+    (*term).insert(*db);
+    if ((*term).hasParents())
+      std::transform((*term).getIsA().begin(), (*term).getIsA().end(),
+                     std::back_inserter(hierarchy), [&term](int is_a) {
+                       return QPair<int, int>{(*term).getID(), is_a};
+                     });
+    else
+      hierarchy.append({(*term).getID(), 0});
+  }
+
+  commit();
+
+  populateGeneOntologyHierarchy(hierarchy);
+}
+
+void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
+    const QString file_name, bool overwrite) {
+  populateGeneOntologyAnnotation(file_name, overwrite,
+                                 file_name.endsWith(".mgi"));
+}
+
+void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
+    const QString mgi_file, bool overwrite, bool from_mgi) {
+  if (overwrite) Execute::exec(*db, "DELETE FROM GeneOntologyAnnotation");
+
+  QFileReader reader(mgi_file);
+
+  transaction();
+
+  while (auto line = reader("!")) {
+    auto record = GeneOntology::GAFRecord(*line, from_mgi);
+    record.insert(*db);
+  }
+
+  commit();
 }

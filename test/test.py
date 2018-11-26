@@ -46,6 +46,7 @@ def main():
         annotation = input_dir + "/annotation.gff"
         uniprot_map = None
         gene_ontology_terms = None
+        gene_ontology_annotation = None
     else:
         annotation = ("/Dropbox/DOGI/Sources/Ensembl/94/"
                       "GeneAnnotations/homo_sapiens/"
@@ -53,6 +54,7 @@ def main():
         uniprot_map = ("/Dropbox/DOGI/Sources/Ensembl/94/Mapping/homo_sapiens/"
                        "Homo_sapiens.GRCh38.94.uniprot.tsv")
         gene_ontology_terms = "/Dropbox/DOGI/Sources/GeneOntology/go.obo"
+        gene_ontology_annotation = "/Dropbox/DOGI/Sources/GeneOntology/goa_human.gaf"
 
     if test or initiate:
         db.populateGenomicFeatures(annotation, True)
@@ -65,5 +67,11 @@ def main():
     # db.populateGenomicFeatures("/Dropbox/DOGI/Sources/Ensembl/"
     #                            "94/GeneAnnotations/homo_sapiens/"
     #                            "Homo_sapiens.GRCh38.94.gff3")
+
+    if gene_ontology_annotation is not None:
+        db.populateGeneOntologyAnnotation(gene_ontology_annotation, True)
+
+
+    db.close()
 
 main()

@@ -153,11 +153,51 @@ inline int select_id(const QSqlDatabase &db, const QString &table,
     return select.value(0).toInt();
 }
 
+inline QVector<int> select_multi_id(const QSqlDatabase &db,
+                                    const QString &table,
+                                    const QString &id_field,
+                                    const QString &signature_field,
+                                    const QString &signature) {
+  auto select = Execute::prepare(
+      db, "SELECT " + id_field + " as id_feature FROM " + table + " WHERE " +
+              signature_field + " = :signature");
+  select.bindValue(":signature", signature);
+  Execute::exec(select);
+
+  QVector<int> result{};
+
+  while (select.next()) {
+    result.append(select.value(0).toInt());
+  }
+
+  return result;
+}
+
 inline int select_id_feature_from_stable_id(const QSqlDatabase &db,
                                             const QString &feature_stable_id) {
   return select_id(db, "GenomicFeatures", "id_feature", "feature_stable_id",
                    feature_stable_id);
 }
+
+inline QVector<int> select_id_feature_from_uniprot(const QSqlDatabase &db,
+                                                   const QString &uniprot_id) {
+  return select_multi_id(db, "UniprotMap", "id_feature", "uniprot_xref",
+                         uniprot_id);
+}
+
+inline int select_id_feature_from_mgi(const QSqlDatabase &db, int id_mgi) {
+  auto select = Execute::prepare(db,
+                                 "SELECT id_feature FROM MGIMap WHERE "
+                                 "id_mgi = :id_mgi");
+  select.bindValue(":id_mgi", id_mgi);
+  Execute::exec(select);
+
+  if (!select.next())
+    return 0;
+  else
+    return select.value(0).toInt();
+}
+
 }  // namespace Select
 
 namespace Update {

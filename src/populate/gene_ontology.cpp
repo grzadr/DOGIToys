@@ -1,18 +1,64 @@
 #include <dogitoys/populate/gene_ontology.hpp>
 
+using namespace DOGIToys;
 using namespace DOGIToys::GeneOntology;
 
+void GeneOntologyTerm::parse(const QString &line) {
+  const auto [field, value] = get_field_value(line, ':', 1);
+
+  if (field == "id")
+    setID(value);
+  else if (field == "name")
+    setName(value);
+  else if (field == "namespace")
+    setNamespace(value);
+  else if (field == "def")
+    setDef(value);
+  else if (field == "synonym")
+    addSynonym(value);
+  else if (field == "is_a")
+    addIsA(value);
+  else if (field == "is_obsolete")
+    setIsObsolete(value);
+  else if (field == "comment")
+    setComment(value);
+  else if (field == "consider")
+    addConsider(value);
+  else if (field == "relationship")
+    addRelationship(value);
+  else if (field == "intersection_of")
+    addIntersectionOf(value);
+  else if (field == "replaced_by")
+    setReplacedBy(value);
+  else if (field == "alt_id")
+    addAltID(value);
+  else if (field == "subset")
+    return;
+  else if (field == "xref")
+    return;
+  else if (field == "disjoint_from")
+    return;
+  else if (field == "created_by")
+    return;
+  else if (field == "creation_date")
+    return;
+  else if (field == "property_value")
+    return;
+  else
+    throw_runerror("Unsupported field: " + line);
+}
+
 void GeneOntologyTerm::setID(const QString &id) {
-  if (const auto temp = extractID(id); this->id != 0)
+  if (const auto temp = extractIntID(id, ':'); this->id != 0)
     throw_runerror("ID already initialized");
   else {
     this->id = temp;
-    this->alt_id.append(temp);
+    //    this->alt_id.append(temp);
   }
 }
 
 void GeneOntologyTerm::setName(const QString &name) {
-  if (!this->name.isEmpty()) throw throw_runerror("Name already initialized");
+  if (!this->name.isEmpty()) throw_runerror("Name already initialized");
   this->name = name;
 }
 
@@ -31,7 +77,7 @@ void GeneOntologyTerm::addSynonym(const QString &synonym) {
 }
 
 void GeneOntologyTerm::addIsA(const QString &is_a) {
-  this->is_a.append(extractID(is_a, '!'));
+  this->is_a.append(extractIntID(is_a, ':'));
 }
 
 void GeneOntologyTerm::setIsObsolete(const QString &obsolete) {
@@ -45,160 +91,113 @@ void GeneOntologyTerm::setComment(const QString &comment) {
 }
 
 void GeneOntologyTerm::addConsider(const QString &consider) {
-  this->consider.append(extractID(consider));
+  this->consider.append(extractIntID(consider, ':'));
 }
 
 void GeneOntologyTerm::addIntersectionOf(const QString &intersection_of) {
-  this->intersection_of.append(extractID(intersection_of, '!'));
+  this->intersection_of.append(extractIntID(intersection_of, ':'));
 }
 
 void GeneOntologyTerm::addRelationship(const QString &relationship) {
-  this->relationship.append(extractID(relationship, '!'));
+  this->relationship.append(extractIntID(relationship, ':'));
 }
 
 void GeneOntologyTerm::setReplacedBy(const QString &replaced_by) {
   if (this->replaced_by != 0) throw_runerror("ID already initialized");
-  this->replaced_by = extractID(replaced_by);
+  this->replaced_by = extractIntID(replaced_by, ':');
 }
 
 void GeneOntologyTerm::addAltID(const QString &alt_id) {
-  this->alt_id.append(extractID(alt_id));
+  this->alt_id.append(extractIntID(alt_id, ':'));
 }
 
-std::optional<GeneOntologyTerm> OBOParser::parse() {
-  do {
-    file->readLineInto();
-  } while (file->line != "[Term]");
+std::optional<GeneOntologyTerm> OBOParser::getTerm() {
+  if (!reader.setLineToMatch("[Term]")) return nullopt;
 
   auto term = GeneOntologyTerm();
 
-  while (file->readLineInto()) {
-    const auto &field = file->line.left(file->line.indexOf(':'));
-    const auto &value = file->line.mid(file->line.indexOf(':') + 2);
-
-    if (file->line.isEmpty())
-      result.append(term);
-    else if (field == "[Term]")
-      term = GeneOntologyTerm();
-    else if (field == "id")
-      term.setID(value);
-    else if (field == "name")
-      term.setName(value);
-    else if (field == "namespace")
-      term.setNamespace(value);
-    else if (field == "def")
-      term.setDef(value);
-    else if (field == "synonym")
-      term.addSynonym(value);
-    else if (field == "is_a")
-      term.addIsA(value);
-    else if (field == "is_obsolete")
-      term.setIsObsolete(value);
-    else if (field == "comment")
-      term.setComment(value);
-    else if (field == "consider")
-      term.addConsider(value);
-    else if (field == "relationship")
-      term.addRelationship(value);
-    else if (field == "intersection_of")
-      term.addIntersectionOf(value);
-    else if (field == "replaced_by")
-      term.setReplacedBy(value);
-    else if (field == "alt_id")
-      term.addAltID(value);
-    else if (field == "subset")
-      continue;
-    else if (field == "xref")
-      continue;
-    else if (field == "disjoint_from")
-      continue;
-    else if (field == "created_by")
-      continue;
-    else if (field == "creation_date")
-      continue;
-    else if (field == "property_value")
-      continue;
-    else if (field == "[Typedef]")
-      break;
-    else
-      throw runtime_error(file->line.toStdString());
+  while (auto line = reader()) {
+    if ((*line).isEmpty()) break;
+    term.parse(*line);
   }
 
-  return result;
+  return term;
 }
 
-void DOGIGOParser::setFile(const QString &file_name) {
-  file = make_unique<DOGIFile>(file_name);
-}
+void GeneOntologyTerm::insert(QSqlDatabase &db) {
+  auto insert =
+      Execute::prepare(db,
+                       "INSERT INTO GeneOntologyTerms "
+                       "(id_go, go_name, go_namespace, "
+                       "go_def, go_comment, go_is_obsolete) "
+                       "VALUES (:id_go, :go_name, :go_namespace, :go_def, "
+                       ":go_comment, :go_is_obsolete)");
 
-void DOGIGO::insertGOTerm(const QSqlDatabase &db, int id_go,
-                          const QString &go_name, const QString &go_namespace,
-                          const QString &go_def, const QString &go_comment,
-                          bool go_is_obsolete, int go_id_master) {
-  QSqlQuery query(db);
+  insert.bindValue(":id_go", id);
+  insert.bindValue(":go_name", name);
+  insert.bindValue(":go_namespace", names);
+  insert.bindValue(":go_def", def);
 
-  prepare(query,
-          "INSERT INTO "
-          "GOTerms (id_go, go_name, go_namespace, go_def, go_comment, "
-          "go_is_obsolete, go_id_master) "
-          "VALUES(:id_go, :go_name, :go_namespace, :go_def, "
-          ":go_comment, :go_is_obsolete, :go_id_master)");
-
-  query.bindValue(":id_go", id_go);
-  query.bindValue(":go_name", go_name);
-  query.bindValue(":go_namespace", go_namespace);
-  query.bindValue(":go_def", go_def);
-  if (go_comment.isEmpty())
-    query.bindValue(":go_comment", QVariant(QVariant::String));
+  if (comment.isEmpty())
+    insert.bindValue(":go_comment", QVariant(QVariant::String));
   else
-    query.bindValue(":go_comment", go_comment);
-  query.bindValue(":go_is_obsolete", go_is_obsolete);
-  query.bindValue(":go_id_master", go_id_master);
+    insert.bindValue(":go_comment", comment);
 
-  exec(query);
+  insert.bindValue(":go_is_obsolete", is_obsolete);
+
+  Execute::exec(insert);
+
+  insert = Execute::prepare(db,
+                            "INSERT INTO GeneOntologyAlternativeIDs "
+                            "(go_alt_id, id_go) "
+                            "VALUES (:go_alt_id, :id_go)");
+
+  insert.bindValue(":id_go", id);
+
+  for (const auto &go_alt_id : getAltID()) {
+    insert.bindValue(":go_alt_id", go_alt_id);
+    Execute::exec(insert);
+  }
 }
 
-void DOGIGO::insertGOHierarchy(const QSqlDatabase &db, int id_go, int go_is_a) {
-  QSqlQuery query(db);
+void GeneOntology::insert_go_hierarchy(const QSqlDatabase &db, int id_go,
+                                       int go_is_a) {
+  auto insert = Execute::prepare(db,
+                                 "INSERT INTO GeneOntologyHierarchy "
+                                 "(id_go, go_is_a) "
+                                 "VALUES (:id_go, :go_is_a)");
 
-  prepare(query,
-          "INSERT INTO GOHierarchy (id_go, go_is_a) VALUES (:id_go, :go_is_a)");
+  insert.bindValue(":id_go", id_go);
+  insert.bindValue(":go_is_a", go_is_a ? go_is_a : QVariant(QVariant::Int));
 
-  query.bindValue(":id_go", id_go);
-  query.bindValue(":go_is_a", go_is_a ? go_is_a : QVariant(QVariant::Int));
-
-  exec(query);
+  Execute::exec(insert);
 }
 
-qvec_pair_int DOGIGO::insertGOTerm(const QSqlDatabase &db,
-                                   const GeneOntologyTerm &term) {
-  for (const auto &id_go : term.getAltID())
-    DOGIGO::insertGOTerm(db, id_go, term.getName(), term.getNamespace(),
-                         term.getDef(), term.getComment(), term.isObsolete(),
-                         term.getID());
-  qvec_pair_int result{};
-  if (term.hasSlaves())
-    for (const auto &id_go : term.getIsA())
-      result.append({term.getID(), id_go});
-  else
-    result.append({term.getID(), 0});
+GAFRecord::GAFRecord(const QString &line, bool from_mgi) : from_mgi{from_mgi} {
+  const auto &data = line.split("\t");
 
-  return result;
+  uniprot_xref = data[1];
+  id_go = extractIntID(data[4], ':');
 }
 
-void DOGIGO::insertGOAnnotation(const QSqlDatabase &db,
-                                const QString &id_database, int id_feature,
-                                int id_go) {
-  QSqlQuery query(db);
+void GAFRecord::insert(QSqlDatabase &db) const {
+  auto insert = Execute::prepare(db,
+                                 "INSERT OR IGNORE INTO "
+                                 "GeneOntologyAnnotation (id_feature, id_go) "
+                                 "VALUES (:id_feature, :id_go)");
+  insert.bindValue(":id_go", id_go);
 
-  prepare(query,
-          "INSERT OR IGNORE INTO GOAnnotations "
-          "(id_database, id_feature, id_go) "
-          "VALUES (:id_database, :id_feature, :id_go)");
-
-  query.bindValue(":id_database", id_database);
-  query.bindValue(":id_feature", id_feature);
-  query.bindValue(":id_go", id_go);
-
-  exec(query);
+  if (from_mgi) {
+    if (const auto id_feature = Select::select_id_feature_from_mgi(
+            db, extractIntID(uniprot_xref, ':'));
+        id_feature) {
+      insert.bindValue(":id_feature", id_feature);
+      Execute::exec(insert);
+    }
+  } else {
+    for (const int id_feature :
+         Select::select_id_feature_from_uniprot(db, uniprot_xref)) {
+      insert.bindValue(":id_feature", id_feature);
+    }
+  }
 }

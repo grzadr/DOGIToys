@@ -257,31 +257,6 @@ inline static QStringList UniprotMap{
     "UniprotMap(uniprot_db_name)",
     "CREATE INDEX idx_MapUniprot_uniprot_info_type ON "
     "UniprotMap(uniprot_info_type)",
-
-    //    "CREATE TABLE MapGFF3 ("
-    //    "id_mapping INTEGER PRIMARY KEY NOT NULL,"
-    //    "id_database_from TEXT NOT NULL COLLATE NOCASE,"
-    //    "id_feature_from INTEGER NOT NULL,"
-    //    "id_database_to TEXT NOT NULL COLLATE NOCASE,"
-    //    "id_feature_to INTEGER NOT NULL,"
-    //    ""
-    //    "CONSTRAINT unique_mapping "
-    //    "UNIQUE(id_database_from, id_feature_from, id_database_to,
-    //    id_feature_to),"
-    //    ""
-    //    "CONSTRAINT fk_MapGFF3_from "
-    //    "FOREIGN KEY (id_database_from, id_feature_from) "
-    //    "REFERENCES GFF3Features(id_database, id_feature),"
-    //    ""
-    //    "CONSTRAINT fk_MapGFF3_to "
-    //    "FOREIGN KEY (id_database_to, id_feature_to) "
-    //    "REFERENCES GFF3Features(id_database, id_feature)"
-    //    ")",
-    //    "CREATE INDEX idx_MapGFF3_from ON MapGFF3(id_database_from, "
-    //    "id_feature_from)",
-    //    "CREATE INDEX idx_MapGFF3_to ON MapGFF3(id_database_to,
-    //    id_feature_to)",
-
 };
 
 inline static QStringList MGIMap{
@@ -302,7 +277,7 @@ inline static QStringList MGIMap{
 
 inline static QStringList GeneOntology{
     "DROP VIEW IF EXISTS GeneOntologySlaves;",
-    "DROP TABLE IF EXISTS GeneOntologyAnnotations;",
+    "DROP TABLE IF EXISTS GeneOntologyAlternativeIDs;",
     "DROP TABLE IF EXISTS GeneOntologyHierarchy;",
     "DROP TABLE IF EXISTS GeneOntologyTerms;",
 
@@ -312,17 +287,13 @@ inline static QStringList GeneOntology{
     "go_namespace TEXT NOT NULL COLLATE NOCASE, "
     "go_def TEXT NOT NULL COLLATE NOCASE, "
     "go_comment TEXT DEFAULT NULL COLLATE NOCASE, "
-    "go_is_obsolete BOOLEAN NOT NULL DEFAULT FALSE, "
-    "go_id_master INTEGER DEFAULT NULL, "
-    ""
-    "CONSTRAINT fk_GeneOntologyTerms_id_master "
-    "FOREIGN KEY (go_id_master) "
-    "REFERENCES GeneOntologyTerms(id_go) "
-    "ON DELETE CASCADE "
+    "go_is_obsolete BOOLEAN NOT NULL DEFAULT FALSE "
     ")",
 
     "CREATE INDEX idx_GeneOntologyTerms_namespace ON "
     "GeneOntologyTerms(go_namespace)",
+    "CREATE INDEX idx_GeneOntologyTerms_obsolete ON "
+    "GeneOntologyTerms(go_is_obsolete)",
 
     "CREATE TABLE GeneOntologyHierarchy ("
     "id_go INTEGER NOT NULL,"
@@ -343,18 +314,11 @@ inline static QStringList GeneOntology{
 
     "CREATE INDEX idx_GOHierarchy_go_is_a ON GeneOntologyHierarchy(go_is_a)",
 
-    "CREATE TABLE GeneOntologyAnnotations("
-    "id_feature INTEGER NOT NULL, "
-    "id_go INTEGER NOT NULL, "
+    "CREATE TABLE GeneOntologyAlternativeIDs ("
+    "go_alt_id INTEGER PRIMARY KEY NOT NULL,"
+    "id_go INTEGER NOT NULL,"
     ""
-    "PRIMARY KEY (id_feature, id_go), "
-    ""
-    "CONSTRAINT fk_GeneOntologyAnnotations_id_feature "
-    "FOREIGN KEY (id_feature) "
-    "REFERENCES GenomicFeatures(id_feature) "
-    "ON DELETE CASCADE, "
-    ""
-    "CONSTRAINT fk_GeneOntologyAnnotations_id_go "
+    "CONSTRAINT fk_id_go "
     "FOREIGN KEY (id_go) "
     "REFERENCES GeneOntologyTerms(id_go) "
     "ON DELETE CASCADE"
@@ -369,9 +333,32 @@ inline static QStringList GeneOntology{
     "(WITH RECURSIVE GeneOntologySlave(go_slave) AS ("
     "VALUES(HM.id_go) "
     "UNION ALL "
-    "SELECT id_go FROM GeneOntologyHierarchy, GOSlave "
+    "SELECT id_go FROM GeneOntologyHierarchy, GeneOntologySlave "
     "WHERE go_is_a = GeneOntologySLave.go_slave "
     ") SELECT * FROM GeneOntologySlave)",
+};
+
+inline static QStringList GeneOntologyAnnotation{
+    "DROP TABLE IF EXISTS GeneOntologyAnnotation;",
+    "CREATE TABLE GeneOntologyAnnotation("
+    "id_feature INTEGER NOT NULL, "
+    "id_go INTEGER NOT NULL, "
+    ""
+    "PRIMARY KEY (id_feature, id_go), "
+    ""
+    "CONSTRAINT fk_GeneOntologyAnnotation_id_feature "
+    "FOREIGN KEY (id_feature) "
+    "REFERENCES GenomicFeatures(id_feature) "
+    "ON DELETE CASCADE, "
+    ""
+    "CONSTRAINT fk_GeneOntologyAnnotation_id_go "
+    "FOREIGN KEY (id_go) "
+    "REFERENCES GeneOntologyTerms(id_go) "
+    "ON DELETE CASCADE"
+    ")",
+
+    "CREATE INDEX idx_GeneOntologyAnnotation_id_go ON "
+    "GeneOntologyAnnotation(id_go)",
 };
 
 }  // namespace Schemas
@@ -382,6 +369,7 @@ void init_main(QSqlDatabase &db);
 void init_taxon(QSqlDatabase &db, QString taxons = {});
 void init_genomic_features(QSqlDatabase &db);
 void init_genomic_sequences(QSqlDatabase &db);
-void init_uniprot_map(QSqlDatabase &db);
+void init_map_uniprot(QSqlDatabase &db);
+void init_map_mgi(QSqlDatabase &db);
 void init_gene_ontology(QSqlDatabase &db);
 }  // namespace DOGIToys::Initiate
