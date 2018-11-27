@@ -45,6 +45,7 @@ def main():
     uniprot_map = None
     gene_ontology_terms = None
     gene_ontology_annotation = None
+    gene_structs = None
     annotation = input_dir + "/annotation.gff"
 
     if not test:
