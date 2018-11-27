@@ -4,6 +4,8 @@ project(DOGIToys VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(hkl)
+
 find_package (Python3 COMPONENTS Interpreter Development)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -46,7 +48,7 @@ target_compile_options(DOGIToys PRIVATE
 
 target_link_libraries(DOGIToys Qt5::Core Qt5::Sql)
 
-add_subdirectory(hkl)
+
 pybind11_add_module(pyDOGIToys ${CMAKE_CURRENT_SOURCE_DIR}/src/pydogitoys.cpp)
 target_include_directories(pyDOGIToys
     PRIVATE
@@ -68,9 +70,9 @@ install(TARGETS DOGIToys
 install(TARGETS pyDOGIToys
         LIBRARY DESTINATION ${PYTHON_INSTALL_PREFIX})
 
-add_custom_command(TARGET pyDOGIToys POST_BUILD
-    COMMAND
-        "python3"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+# add_custom_command(TARGET pyDOGIToys POST_BUILD
+#     COMMAND
+#         "python3"
+#         "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
+#         "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
