@@ -31,6 +31,7 @@ class Populator {
   void initUniprotMap();
   void initMGIMap();
   void initGeneOntology();
+  void initStructuralVariants();
 
   void transaction() const { Transaction::transaction(*db); }
   void commit() const { Transaction::commit(*db); }
@@ -57,6 +58,8 @@ class Populator {
 
   void populateGeneOntologyTerms(const QString& obo_file, bool overwrite);
   void populateGeneOntologyAnnotation(const QString file_name, bool overwrite);
+
+  void populateStructuralVariants(const QString& gvf_file, bool overwrite);
 };
 
 }  // namespace DOGIToys::Populate

@@ -76,3 +76,9 @@ void DOGIToys::Initiate::init_map_mgi(QSqlDatabase &db) {
   Execute::exec(db, Schemas::MGIMap);
   Transaction::commit(db);
 }
+
+void DOGIToys::Initiate::init_structural_variants(QSqlDatabase &db) {
+  Transaction::transaction(db);
+  Execute::exec(db, Schemas::StructuralVariants);
+  Transaction::commit(db);
+}

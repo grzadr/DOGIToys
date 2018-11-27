@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+DOGIToys::Populate::QGFFRecord::QGFFRecord(HKL::GFF::GFFRecord record)
+    : record{record} {}
+
 void DOGIToys::Populate::insert_SeqID(QSqlDatabase &db, const QString &name,
                                       int first, int last) {
   auto insert =
@@ -149,4 +152,74 @@ int DOGIToys::Populate::GenomicFeature::insert() {
   insert_feature();
   insert_attributes();
   return id_feature;
+}
+
+DOGIToys::Populate::GenomicFeature::GenomicFeature(QSqlDatabase &db,
+                                                   HKL::GFF::GFFRecord record)
+    : db{db}, record{record} {}
+
+DOGIToys::Populate::StructuralVariant::StructuralVariant(
+    HKL::GFF::GFFRecord record)
+    : QGFFRecord(record) {
+  id_record = std::stoi(*record.at("ID"));
+  signature = extractID(QString::fromStdString(*record.at("Dbxref")), ':');
+}
+
+void DOGIToys::Populate::StructuralVariant::insert(QSqlDatabase &db) {
+  auto query =
+      Execute::prepare(db,
+                       "INSERT INTO StructuralVariants ("
+                       "id_struct, struct_seqid, struct_source, struct_type, "
+                       "struct_start, struct_end, struct_length, struct_strand,"
+                       "struct_signature, struct_study, "
+                       "struct_parent_signature,"
+                       "struct_start_range_start, struct_start_range_end,"
+                       "struct_end_range_start, struct_end_range_end"
+                       ") VALUES ("
+                       ":id, :seqid, :source, :type, "
+                       ":start, :end, :length, :strand,"
+                       ":signature, :study, :parent_signature,"
+                       ":start_range_start, :start_range_end,"
+                       ":end_range_start, :end_range_end"
+                       ")");
+  bindMainValues(query, obligatory_fields);
+  query.bindValue(":signature", signature);
+  query.bindValue(":study", getStudy());
+  query.bindValue(":parent_signature", getParent());
+  bindStartRange(query);
+  bindEndRange(query);
+
+  Execute::exec(query);
+}
+
+void DOGIToys::Populate::StructuralVariant::bindStartRange(
+    QSqlQuery &query) const {
+  if (const auto &range = record.get("Start_range")) {
+    const auto &start_end = QString::fromStdString(*range.value()).split(',');
+    if (start_end.size() != 2)
+      throw_runerror("Start_range of element ID=" + *record.at("ID") +
+                     " is not correct");
+
+    query.bindValue(":start_range_start", start_end.first());
+    query.bindValue(":start_range_end", start_end.last());
+  } else {
+    query.bindValue(":start_range_start", QVariant(QVariant::String));
+    query.bindValue(":start_range_end", QVariant(QVariant::String));
+  }
+}
+
+void DOGIToys::Populate::StructuralVariant::bindEndRange(
+    QSqlQuery &query) const {
+  if (const auto &range = record.get("End_range")) {
+    const auto &start_end = QString::fromStdString(*range.value()).split(',');
+    if (start_end.size() != 2)
+      throw_runerror("End_range of element ID=" + *record.at("ID") +
+                     " is not correct");
+
+    query.bindValue(":end_range_start", start_end.first());
+    query.bindValue(":end_range_end", start_end.last());
+  } else {
+    query.bindValue(":end_range_start", QVariant(QVariant::String));
+    query.bindValue(":end_range_end", QVariant(QVariant::String));
+  }
 }

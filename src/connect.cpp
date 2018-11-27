@@ -127,3 +127,7 @@ void DOGI::populateGeneOntologyAnnotation(const QString gaf_file,
                                           bool overwrite) {
   populator.populateGeneOntologyAnnotation(gaf_file, overwrite);
 }
+
+void DOGI::populateStructuralVariants(const QString gvf_file, bool overwrite) {
+  populator.populateStructuralVariants(gvf_file, overwrite);
+}

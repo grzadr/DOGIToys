@@ -32,6 +32,10 @@ void DOGIToys::Populate::Populator::initGeneOntology() {
   Initiate::init_gene_ontology(*db);
 }
 
+void DOGIToys::Populate::Populator::initStructuralVariants() {
+  Initiate::init_structural_variants(*db);
+}
+
 void DOGIToys::Populate::Populator::populateGeneOntologyHierarchy(
     const QVector<QPair<int, int>> hierarchy) {
   transaction();
@@ -200,6 +204,26 @@ void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
   while (auto line = reader("!")) {
     auto record = GeneOntology::GAFRecord(*line, from_mgi);
     record.insert(*db);
+  }
+
+  commit();
+}
+
+void DOGIToys::Populate::Populator::populateStructuralVariants(
+    const QString& gvf_file, bool overwrite) {
+  if (overwrite || !db->tables().contains("GeneStructuralVariants"))
+    initStructuralVariants();
+
+  qInfo() << "Populating Structural Variants";
+
+  HKL::GFF::GFFReader reader(gvf_file.toStdString());
+
+  transaction();
+
+  while (const auto record = reader("#")) {
+    StructuralVariant temp(std::get<GFF::GFFRecord>(*record));
+    temp.insert(*db);
+    if (temp.getRecordID() % 100000 == 0) qInfo() << temp.getRecordID();
   }
 
   commit();

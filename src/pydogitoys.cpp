@@ -54,5 +54,9 @@ PYBIND11_MODULE(pyDOGIToys, m) {
       .def("populateGeneOntologyAnnotation",
            py::overload_cast<string, bool>(
                &DOGI::populateGeneOntologyAnnotation),
-           "gaf_file"_a, "overwrite"_a = true);
+           "gaf_file"_a, "overwrite"_a = true)
+
+      .def("populateStructuralVariants",
+           py::overload_cast<string, bool>(&DOGI::populateStructuralVariants),
+           "gvf_file"_a, "overwrite"_a = true);
 }

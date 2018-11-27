@@ -160,6 +160,11 @@ class DOGI {
   void populateGeneOntologyAnnotation(const string gaf_file, bool overwrite) {
     populateGeneOntologyAnnotation(QString::fromStdString(gaf_file), overwrite);
   }
+
+  void populateStructuralVariants(const QString gvf_file, bool overwrite);
+  void populateStructuralVariants(const string gvf_file, bool overwrite) {
+    populateStructuralVariants(QString::fromStdString(gvf_file), overwrite);
+  }
 };
 
 }  // namespace DOGIToys

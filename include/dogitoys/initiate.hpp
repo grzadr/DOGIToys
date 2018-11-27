@@ -362,6 +362,7 @@ inline static QStringList GeneOntologyAnnotation{
 inline static QStringList StructuralVariants{
     "DROP TABLE IF EXISTS StructuralVariants",
 
+    "CREATE TABLE StructuralVariants("
     "id_struct INTEGER PRIMARY KEY NOT NULL,"
     "struct_seqid TEXT NOT NULL COLLATE NOCASE,"
     "struct_source TEXT COLLATE NOCASE,"
@@ -371,13 +372,15 @@ inline static QStringList StructuralVariants{
     "struct_length INTEGER NOT NULL,"
     "struct_strand COLLATE NOCASE,"
     "struct_id_parent INTEGER DEFAULT NULL,"
+    "struct_signature TEXT NOT NULL COLLATE NOCASE,"
+    "struct_study TEXT NOT NULL COLLATE NOCASE,"
     "struct_parent_signature TEXT DEFAULT NULL COLLATE NOCASE,"
-    "struct_signature TEXT COLLATE NOCASE,"
-    "struct_study TEXT COLLATE NOCASE,"
     "struct_start_range_start INTEGER DEFAULT NULL,"
     "struct_start_range_end INTEGER DEFAULT NULL,"
     "struct_end_range_start INTEGER DEFAULT NULL,"
     "struct_end_range_end INTEGER DEFAULT NULL,"
+    ""
+    //    "CONSTRAINT unique_signature UNIQUE (struct_signature),"
     ""
     "CONSTRAINT typeof_id_parent "
     "CHECK(struct_id_parent IS NULL OR TYPEOF(struct_id_parent) = "
@@ -401,12 +404,17 @@ inline static QStringList StructuralVariants{
     "CONSTRAINT fk_StructuralVariants_seqid "
     "FOREIGN KEY (struct_seqid) "
     "REFERENCES SeqIDs (seqid_name) "
-    "ON DELETE CASCADE,"
+    "ON DELETE CASCADE, "
     ""
-    "CONSTRAINT fk_Features_id_parent "
+    "CONSTRAINT fk_StructuralVariants_id_parent "
     "FOREIGN KEY (struct_id_parent) "
     "REFERENCES StructuralVariants (id_struct) "
-    "ON DELETE CASCADE"
+    "ON DELETE CASCADE "
+    ""
+    //    "CONSTRAINT fk_StructuralVariants_parent_signature "
+    //    "FOREIGN KEY (struct_parent_signature) "
+    //    "REFERENCES StructuralVariants (struct_signature) "
+    //    "ON DELETE CASCADE"
     ""
     ")",
 
@@ -423,4 +431,5 @@ void init_genomic_sequences(QSqlDatabase &db);
 void init_map_uniprot(QSqlDatabase &db);
 void init_map_mgi(QSqlDatabase &db);
 void init_gene_ontology(QSqlDatabase &db);
+void init_structural_variants(QSqlDatabase &db);
 }  // namespace DOGIToys::Initiate

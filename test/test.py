@@ -14,7 +14,7 @@ def main():
     db = DOGI();
     print("Done!\n")
 
-    test = False
+    test = True
     initiate=False
 
     if test:
@@ -42,19 +42,21 @@ def main():
         db.open("/Dropbox/DOGI/temp.db", initiate)
         db.setTaxon("human", True)
 
-    if test:
-        annotation = input_dir + "/annotation.gff"
-        uniprot_map = None
-        gene_ontology_terms = None
-        gene_ontology_annotation = None
-    else:
+    uniprot_map = None
+    gene_ontology_terms = None
+    gene_ontology_annotation = None
+    annotation = input_dir + "/annotation.gff"
+
+    if not test:
         annotation = ("/Dropbox/DOGI/Sources/Ensembl/94/"
                       "GeneAnnotations/homo_sapiens/"
                       "Homo_sapiens.GRCh38.94.gff3")
-        uniprot_map = ("/Dropbox/DOGI/Sources/Ensembl/94/Mapping/homo_sapiens/"
-                       "Homo_sapiens.GRCh38.94.uniprot.tsv")
-        gene_ontology_terms = "/Dropbox/DOGI/Sources/GeneOntology/go.obo"
-        gene_ontology_annotation = "/Dropbox/DOGI/Sources/GeneOntology/goa_human.gaf"
+        # uniprot_map = ("/Dropbox/DOGI/Sources/Ensembl/94/Mapping/homo_sapiens/"
+        #                "Homo_sapiens.GRCh38.94.uniprot.tsv")
+        # gene_ontology_terms = "/Dropbox/DOGI/Sources/GeneOntology/go.obo"
+        # gene_ontology_annotation = "/Dropbox/DOGI/Sources/GeneOntology/goa_human.gaf"
+        gene_structs = "/Dropbox/DOGI/Sources/Ensembl/94/Variants/homo_sapiens/small.gvf"
+
 
     if test or initiate:
         db.populateGenomicFeatures(annotation, True)
@@ -64,13 +66,12 @@ def main():
 
     if gene_ontology_terms is not None:
         db.populateGeneOntologyTerms(gene_ontology_terms, True)
-    # db.populateGenomicFeatures("/Dropbox/DOGI/Sources/Ensembl/"
-    #                            "94/GeneAnnotations/homo_sapiens/"
-    #                            "Homo_sapiens.GRCh38.94.gff3")
 
     if gene_ontology_annotation is not None:
         db.populateGeneOntologyAnnotation(gene_ontology_annotation, True)
 
+    if gene_structs is not None:
+        db.populateStructuralVariants(gene_structs, True)
 
     db.close()
 

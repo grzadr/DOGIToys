@@ -4,8 +4,10 @@ project(DOGIToys VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 17)
 
+find_package (Python3 COMPONENTS Interpreter Development)
+
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "/usr/lib/python3.6" CACHE PATH "..." FORCE)
+  set(CMAKE_INSTALL_PREFIX ${Python3_SITELIB} CACHE PATH "..." FORCE)
 endif()
 
 if (NOT HEADER_INSTALL_PREFIX)
@@ -33,9 +35,6 @@ target_include_directories(DOGIToys
 )
 
 target_compile_features(DOGIToys PRIVATE cxx_std_17)
-#target_compile_options(DOGIToys PRIVATE -march=x86-64 -mtune=native -O3
-#                       -pipe -fPIE -fPIC -fstack-protector-strong -fno-plt
-#                       -fvisibility=hidden -Werror -Wall -pthread)
 target_compile_options(DOGIToys PRIVATE
     -Werror -Wall
     -pthread -O3
@@ -44,7 +43,7 @@ target_compile_options(DOGIToys PRIVATE
 
 target_link_libraries(DOGIToys Qt5::Core Qt5::Sql)
 
-add_subdirectory(hkl/agizmo/pybind11)
+add_subdirectory(hkl)
 pybind11_add_module(pyDOGIToys ${CMAKE_CURRENT_SOURCE_DIR}/src/pydogitoys.cpp)
 target_include_directories(pyDOGIToys
     PRIVATE
@@ -53,7 +52,6 @@ target_include_directories(pyDOGIToys
         ${CMAKE_CURRENT_SOURCE_DIR}/hkl/agizmo/include
 )
 set(PYBIND11_CPP_STANDARD -std=c++17)
-target_compile_options(pyDOGIToys PRIVATE -Werror -Wall -pthread)
 target_link_libraries(pyDOGIToys PRIVATE DOGIToys)
 target_compile_options(pyDOGIToys PRIVATE
     -Werror -Wall
