@@ -57,11 +57,11 @@ target_include_directories(pyDOGIToys
         ${CMAKE_CURRENT_SOURCE_DIR}/hkl/agizmo/include
 )
 set(PYBIND11_CPP_STANDARD -std=c++17)
-# target_compile_options(pyDOGIToys PRIVATE
-#     -Werror -Wall
-#     -pthread -O3
-#     -mtune=native -march=x86-64
-#     -pipe -fPIE -fPIC)
+target_compile_options(pyDOGIToys PRIVATE
+    -Werror -Wall
+    -pthread -O3
+    -mtune=native -march=x86-64
+    -pipe -fPIE -fPIC)
 target_link_libraries(pyDOGIToys PRIVATE DOGIToys)
 
 install(DIRECTORY include/dogitoys DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
@@ -70,9 +70,9 @@ install(TARGETS DOGIToys
 install(TARGETS pyDOGIToys
         LIBRARY DESTINATION ${PYTHON_INSTALL_PREFIX})
 
-# add_custom_command(TARGET pyDOGIToys POST_BUILD
-#     COMMAND
-#         "python3"
-#         "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
-#         "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(TARGET pyDOGIToys POST_BUILD
+    COMMAND
+        "python3"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
