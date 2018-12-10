@@ -15,10 +15,20 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase &db, QString taxons) {
                           "INSERT INTO Taxons (id_taxon, taxon_name) "
                           "VALUES (:id_taxon, :taxon_name)");
 
-    for (const auto &[id_taxon, name] : Schemas::BasicTaxonIDs) {
+    for (const auto &[id_taxon, taxon_name] : Schemas::BasicTaxonIDs) {
       insert.bindValue(":id_taxon", id_taxon);
-      insert.bindValue(":taxon_name", name);
+      insert.bindValue(":taxon_name", taxon_name);
       exec(insert);
+      if (taxon_name.contains(' ')) {
+        auto insert_alias =
+            prepare(db,
+                    "INSERT INTO TaxonAliases (id_alias, id_taxon) "
+                    "VALUES (:id_alias, :id_taxon)");
+        insert_alias.bindValue(":id_alias",
+                               QString(taxon_name).replace(' ', '_'));
+        insert_alias.bindValue(":id_taxon", id_taxon);
+        exec(insert_alias);
+      }
       insert.finish();
     }
 
@@ -30,6 +40,12 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase &db, QString taxons) {
       insert.bindValue(":id_alias", id_alias);
       insert.bindValue(":id_taxon", id_taxon);
       exec(insert);
+      if (id_alias.contains(' ')) {
+        qInfo() << QString(id_alias).replace(' ', '_');
+        insert.bindValue(":id_alias", QString(id_alias).replace(' ', '_'));
+        exec(insert);
+      }
+
       insert.finish();
     }
 

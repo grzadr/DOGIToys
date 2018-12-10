@@ -142,6 +142,10 @@ class DOGI {
                              QString::fromStdString(masking), overwrite);
   }
 
+  void populateMap(QString map_file, bool overwrite = true);
+  void populateMap(string map_file, bool overwrite = true) {
+    populateMap(QString::fromStdString(map_file), overwrite);
+  }
   void populateUniprotMap(QString map_file, bool overwrite = true);
   void populateUniprotMap(string map_file, bool overwrite = true) {
     populateUniprotMap(QString::fromStdString(map_file), overwrite);

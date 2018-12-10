@@ -111,6 +111,13 @@ void DOGI::populateGenomicSequences(QString fasta_file, QString masking,
   populator.populateGenomicSequences(fasta_file, masking, overwrite);
 }
 
+void DOGI::populateMap(QString map_file, bool overwrite) {
+  if (map_file.endsWith(".rpt"))
+    populateMGIMap(map_file, overwrite);
+  else
+    populateUniprotMap(map_file, overwrite);
+}
+
 void DOGI::populateUniprotMap(QString map_file, bool overwrite) {
   populator.populateUniprotMap(map_file, overwrite);
 }

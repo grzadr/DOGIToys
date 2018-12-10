@@ -30,6 +30,7 @@ add_library(DOGIToys SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/genomic_features.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/mapping.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/gene_ontology.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/populate/parameters.cpp
     )
 
 target_include_directories(DOGIToys
@@ -47,6 +48,26 @@ target_compile_options(DOGIToys PRIVATE
     -pipe -fPIE -fPIC)
 
 target_link_libraries(DOGIToys Qt5::Core Qt5::Sql)
+
+
+add_executable(CreateDOGI
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/create.cpp
+)
+
+target_include_directories(CreateDOGI
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/hkl/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/hkl/agizmo/include
+)
+
+target_compile_options(CreateDOGI PRIVATE
+    -Werror -Wall
+    -pthread -O3
+    -mtune=native -march=x86-64
+    -pipe -fPIE -fPIC)
+
+target_link_libraries(CreateDOGI PRIVATE DOGIToys)
 
 
 pybind11_add_module(pyDOGIToys ${CMAKE_CURRENT_SOURCE_DIR}/src/pydogitoys.cpp)

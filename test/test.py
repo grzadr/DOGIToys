@@ -1,10 +1,17 @@
 #!/usr/bin/python3
 
 from sys import path, argv
+import os
 
-path.append(".")
+import sys
+sys.path.insert(0, os.getcwd())
 
 from pyDOGIToys import DOGI
+import pyDOGIToys
+
+print(path)
+print(pyDOGIToys.__file__)
+
 
 def main():
     input_dir = argv[1]
