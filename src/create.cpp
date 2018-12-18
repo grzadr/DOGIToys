@@ -2,5 +2,7 @@
 
 int main(int argc, char *argv[]) {
   AGizmo::Args::Arguments args{};
-  args.add
+  args.addArgument("first", "first argument", );
+
+  args.parse(argc, argv);
 }
