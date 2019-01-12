@@ -28,11 +28,11 @@ class Parameters {
   void parse(const AGizmo::Args::Arguments &args);
   void parse(int argc, char *argv[]) {
     //      const auto args = AGizmo::Args::Arguments(argc, argv);
-    parse(AGizmo::Args::Arguments(argc, argv));
+    //    parse(AGizmo::Args::Arguments(argc, argv));
   }
   void parse(const QString json_file);
 
   Parameters() = default;
 };
 
-}  // namespace DOGIToys
+} // namespace DOGIToys
