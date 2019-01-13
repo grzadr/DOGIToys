@@ -1,3 +1,4 @@
+#include <dogitoys/connect.hpp>
 #include <dogitoys/create.hpp>
 #include <dogitoys/populate/parameters.hpp>
 
@@ -25,4 +26,6 @@ int main(int argc, char *argv[]) {
   DOGIToys::Parameters params{};
 
   params.parse(args);
+
+  DOGIToys::DOGI dogi{};
 }
