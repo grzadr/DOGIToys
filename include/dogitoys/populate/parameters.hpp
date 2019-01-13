@@ -24,15 +24,13 @@ class Parameters {
   std::optional<QString> ontology_terms{};
   std::optional<QString> ontology_annotation{};
   QVector<QString> features_map{};
+  QVector<QString> sequences{};
+
+public:
+  Parameters() = default;
 
   void parse(const AGizmo::Args::Arguments &args);
-  void parse(int argc, char *argv[]) {
-    //      const auto args = AGizmo::Args::Arguments(argc, argv);
-    //    parse(AGizmo::Args::Arguments(argc, argv));
-  }
   void parse(const QString json_file);
-
-  Parameters() = default;
 };
 
 } // namespace DOGIToys

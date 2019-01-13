@@ -40,7 +40,7 @@ void DOGIToys::Populate::Populator::populateGeneOntologyHierarchy(
     const QVector<QPair<int, int>> hierarchy) {
   transaction();
 
-  for (const auto& [go_id, go_parent] : hierarchy)
+  for (const auto &[go_id, go_parent] : hierarchy)
     GeneOntology::insert_go_hierarchy(*db, go_id, go_parent);
 
   commit();
@@ -50,7 +50,8 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
                                                             bool initiate) {
   qInfo() << "Populating Genomic Features";
 
-  if (initiate) initGenomicFeatures();
+  if (initiate)
+    initGenomicFeatures();
 
   qInfo() << "File:" << gff3_file;
 
@@ -60,8 +61,8 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
 
   while (auto record = reader()) {
     if ((*record).index() == 0) {
-      const auto& comment = std::get<0>(*record);
-      if (const auto& seqid = comment.getRegion())
+      const auto &comment = std::get<0>(*record);
+      if (const auto &seqid = comment.getRegion())
         insert_SeqID(*db, QString::fromStdString((*seqid).getChrom()),
                      (*seqid).getFirst(), (*seqid).getLast());
     } else {
@@ -84,7 +85,8 @@ void DOGIToys::Populate::Populator::populateGenomicSequences(QString fasta_file,
   if (masking != "hard" && masking != "soft" && masking != "none")
     throw_runerror("Unsupported masking: " + masking);
 
-  if (initiate) initGenomicSequences();
+  if (initiate)
+    initGenomicSequences();
 
   HKL::FASTAReader reader(fasta_file.toStdString());
 
@@ -98,12 +100,11 @@ void DOGIToys::Populate::Populator::populateGenomicSequences(QString fasta_file,
 }
 
 void DOGIToys::Populate::Populator::insertGenomicSequence(
-    const HKL::RegionSeq& seq, const QString masking) {
-  auto insert = Execute::prepare(*db,
-                                 "INSERT INTO GenomicSequences("
-                                 "id_sequence, sequence_masking,"
-                                 "sequence_seq, sequence_length) "
-                                 "VALUES (:id, :masking, :seq, :length)");
+    const HKL::RegionSeq &seq, const QString masking) {
+  auto insert = Execute::prepare(*db, "INSERT INTO GenomicSequences("
+                                      "id_sequence, sequence_masking,"
+                                      "sequence_seq, sequence_length) "
+                                      "VALUES (:id, :masking, :seq, :length)");
   insert.bindValue(":id", QString::fromStdString(seq.getName()));
   insert.bindValue(":masking", masking);
   insert.bindValue(":seq", QString::fromStdString(seq.getSeq()));
@@ -116,7 +117,8 @@ void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
                                                        bool overwrite) {
   qInfo() << "Populating Uniprot Mappings";
 
-  if (overwrite || !db->tables().contains("UniprotMap")) initUniprotMap();
+  if (overwrite || !db->tables().contains("UniprotMap"))
+    initUniprotMap();
 
   transaction();
 
@@ -136,15 +138,15 @@ void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
 
 void DOGIToys::Populate::Populator::populateMGIMap(const QString map_file,
                                                    bool overwrite) {
-  if (overwrite || !db->tables().contains("MGIMap")) initMGIMap();
+  if (overwrite || !db->tables().contains("MGIMap"))
+    initMGIMap();
 
   QFileReader reader(map_file);
   reader(1);
 
-  auto insert = Execute::prepare(*db,
-                                 "INSERT INTO "
-                                 "MGIMap (id_mgi, id_feature) "
-                                 "VALUES (:id_mgi, :id_feature)");
+  auto insert = Execute::prepare(*db, "INSERT INTO "
+                                      "MGIMap (id_mgi, id_feature) "
+                                      "VALUES (:id_mgi, :id_feature)");
 
   while (auto line = reader()) {
     auto data = (*line).split("\t");
@@ -160,7 +162,7 @@ void DOGIToys::Populate::Populator::populateMGIMap(const QString map_file,
 }
 
 void DOGIToys::Populate::Populator::populateGeneOntologyTerms(
-    const QString& obo_file, bool overwrite) {
+    const QString &obo_file, bool overwrite) {
   if (overwrite || !db->tables().contains("GeneOntologyTerms"))
     initGeneOntology();
 
@@ -195,7 +197,8 @@ void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
 
 void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
     const QString mgi_file, bool overwrite, bool from_mgi) {
-  if (overwrite) Execute::exec(*db, "DELETE FROM GeneOntologyAnnotation");
+  if (overwrite)
+    Execute::exec(*db, "DELETE FROM GeneOntologyAnnotation");
 
   QFileReader reader(mgi_file);
 
@@ -210,7 +213,7 @@ void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
 }
 
 void DOGIToys::Populate::Populator::populateStructuralVariants(
-    const QString& gvf_file, bool overwrite) {
+    const QString &gvf_file, bool overwrite) {
   if (overwrite || !db->tables().contains("GeneStructuralVariants"))
     initStructuralVariants();
 
@@ -223,8 +226,12 @@ void DOGIToys::Populate::Populator::populateStructuralVariants(
   while (const auto record = reader("#")) {
     StructuralVariant temp(std::get<GFF::GFFRecord>(*record));
     temp.insert(*db);
-    if (temp.getRecordID() % 100000 == 0) qInfo() << temp.getRecordID();
+    if (temp.getRecordID() % 100000 == 0)
+      qInfo() << temp.getRecordID();
   }
 
   commit();
 }
+
+void DOGIToys::Populate::Populator::populate(
+    const DOGIToys::Parameters &params) {}

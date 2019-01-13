@@ -1,11 +1,8 @@
 #include <dogitoys/populate/parameters.hpp>
 
-void DOGIToys::Parameters::parse(const AGizmo::Args::Arguments& args) {
-  for (const auto& flag : args) {
-    if (const auto flag_name = flag.getName();
-        flag_name == "name" || flag_name == "n") {
-      if (flag.isEmpty())
-        throw_runerror("Input file not specifed, but --input/-i flag set!");
+void DOGIToys::Parameters::parse(const AGizmo::Args::Arguments &args) {
+  for (const auto &flag : args) {
+    if (const auto flag_name = flag.getName(); flag_name == "name") {
       name = QString::fromStdString(*flag.getValue());
     } else if (flag_name == "taxon" || flag_name == "t") {
       if (flag.isEmpty())
