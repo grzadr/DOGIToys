@@ -29,7 +29,7 @@ using std::nullopt;
 using std::optional;
 
 class DOGI {
- private:
+private:
   shared_ptr<QSqlDatabase> db{nullptr};
   QFileInfo db_file{};
   const QString driver{"QSQLITE"};
@@ -67,13 +67,15 @@ class DOGI {
     }
   }
 
- public:
+public:
   DOGI() = default;
   DOGI(const QString &path, const QString &config = "");
   DOGI(const string &path, const string &config = "")
       : DOGI(QString::fromStdString(path), QString::fromStdString(config)) {}
   DOGI(const char *path, const char *config = "")
       : DOGI(QString::fromLatin1(path), QString::fromLatin1(config)) {}
+
+  DOGI(const Parameters &params);
 
   ~DOGI() { this->close(false, false); }
 
@@ -97,8 +99,7 @@ class DOGI {
     return Execute::prepare(*this->db, query);
   }
 
-  template <class Query>
-  void exec(const Query &query) {
+  template <class Query> void exec(const Query &query) {
     Execute::exec(*db, query);
   }
   void exec(QSqlQuery &query) { Execute::exec(query); }
@@ -171,4 +172,4 @@ class DOGI {
   }
 };
 
-}  // namespace DOGIToys
+} // namespace DOGIToys

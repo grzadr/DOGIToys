@@ -113,6 +113,14 @@ void DOGIToys::Populate::Populator::insertGenomicSequence(
   Execute::exec(insert);
 }
 
+void DOGIToys::Populate::Populator::populateMap(const QString map_file,
+                                                bool overwrite) {
+  if (map_file.endsWith(".rpt"))
+    populateMGIMap(map_file, overwrite);
+  else
+    populateUniprotMap(map_file, overwrite);
+}
+
 void DOGIToys::Populate::Populator::populateUniprotMap(const QString map_file,
                                                        bool overwrite) {
   qInfo() << "Populating Uniprot Mappings";
@@ -234,4 +242,23 @@ void DOGIToys::Populate::Populator::populateStructuralVariants(
 }
 
 void DOGIToys::Populate::Populator::populate(
-    const DOGIToys::Parameters &params) {}
+    const DOGIToys::Parameters &params) {
+
+  if (params.hasFeatures())
+    populateGenomicFeatures(params.getFeatures(), true);
+
+  if (params.hasMapping())
+    populateMap(params.getMapping(), true);
+  else if (params.hasUniprotMapping())
+    populateUniprotMap(params.getUniprotMapping(), true);
+  else if (params.hasMGIMapping())
+    populateGenomicFeatures(params.getFeatures(), true);
+
+  if (params.hasOntologyTerms())
+    populateGeneOntologyTerms(params.getOntologyTerms(), true);
+  if (params.hasOntologyAnnotation())
+    populateGeneOntologyAnnotation(params.getOntologyAnnotation(), true);
+
+  if (params.hasStructural())
+    populateStructuralVariants(params.getStructural(), true);
+}

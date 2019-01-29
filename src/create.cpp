@@ -2,24 +2,26 @@
 #include <dogitoys/create.hpp>
 #include <dogitoys/populate/parameters.hpp>
 
-using ArgsValueType = AGizmo::Args::ValueType;
+using avt = AGizmo::Args::ValueType;
 
 int main(int argc, char *argv[]) {
   AGizmo::Args::Arguments args{};
-  args.addArgument(1, "path", "Path do database file", ArgsValueType::String);
-  args.addArgument(2, "taxon", "Taxon ID/Name", ArgsValueType::String);
-  args.addArgument(3, "features", "File with genomic features",
-                   ArgsValueType::String);
-  args.addArgument("structural", "File with structural variants",
-                   ArgsValueType::String, 's');
-  args.addArgument("ontology-terms", "File with ontology annotation",
-                   ArgsValueType::String, 'o');
-  args.addArgument("ontology-annotation", "File with ontology terms",
-                   ArgsValueType::String, 'a');
-  args.addArgument("uniprot-mapping", "Mapping for Uniprot mapping",
-                   ArgsValueType::String, 'u');
-  args.addArgument("fasta", "FASTA with genomic sequences",
-                   ArgsValueType::String, 'f');
+  args.addArgument("path", "Path do database file", true);
+  args.addArgument("taxon", "Taxon ID/Name", false);
+  args.addArgument("create", "Force database creation", avt::Bool, 'c');
+  args.addArgument("features",
+                   "File with genomic features. Forces database creation",
+                   avt::Single, 'f');
+  args.addArgument("structural", "File with structural variants", avt::Single,
+                   's');
+  args.addArgument("ontology-terms", "File with ontology terms", avt::Single,
+                   't');
+  args.addArgument("ontology", "File with ontology annotation", avt::Single,
+                   'o');
+  args.addArgument("uniprot-mapping", "Mapping for Uniprot", avt::Single, 'u');
+  args.addArgument("mgi-mapping", "Mapping for Uniprot", avt::Single, 'i');
+  args.addArgument("mapping", "Mapping", avt::Single, 'm');
+  args.addArgument("fasta", "FASTA with genomic sequences", avt::Single, 'f');
 
   args.parse(argc, argv);
 
@@ -27,5 +29,5 @@ int main(int argc, char *argv[]) {
 
   params.parse(args);
 
-  DOGIToys::DOGI dogi{};
+  DOGIToys::DOGI dogi{params};
 }

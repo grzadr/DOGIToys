@@ -54,6 +54,7 @@ public:
                                 bool initiate);
   void insertGenomicSequence(const HKL::RegionSeq &seq, const QString masking);
 
+  void populateMap(const QString map_file, bool overwrite);
   void populateUniprotMap(const QString map_file, bool overwrite);
   void populateMGIMap(const QString map_file, bool overwrite);
 

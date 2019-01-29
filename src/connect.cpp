@@ -13,11 +13,18 @@ DOGI::DOGI(const QString &path, const QString &config) : DOGI() {
   }
 }
 
+DOGI::DOGI(const Parameters &params) {
+  open(params.getPath(), params.createDOGI());
+  if (params.hasTaxon())
+    setTaxon(params.getTaxon(), true);
+
+  populator.populate(params);
+}
+
 void DOGI::open(const QString &path, bool create) {
   if (this->isOpen())
-    throw runerror(
-        "DOGI is already connected.\n"
-        "Close current connection, before opening a new one.");
+    throw runerror("DOGI is already connected.\n"
+                   "Close current connection, before opening a new one.");
 
   if (create) {
     qWarning() << "Removing old database";
@@ -43,7 +50,8 @@ void DOGI::open(const QString &path, bool create) {
   else
     qInfo() << "Connected!";
 
-  if (create) populator.initMain();
+  if (create)
+    populator.initMain();
 }
 
 void DOGI::close(bool integrity_check, bool optimize) {
@@ -112,10 +120,7 @@ void DOGI::populateGenomicSequences(QString fasta_file, QString masking,
 }
 
 void DOGI::populateMap(QString map_file, bool overwrite) {
-  if (map_file.endsWith(".rpt"))
-    populateMGIMap(map_file, overwrite);
-  else
-    populateUniprotMap(map_file, overwrite);
+  populator.populateMap(map_file, overwrite);
 }
 
 void DOGI::populateUniprotMap(QString map_file, bool overwrite) {

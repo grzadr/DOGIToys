@@ -91,9 +91,9 @@ install(TARGETS DOGIToys
 install(TARGETS pyDOGIToys
         LIBRARY DESTINATION ${PYTHON_INSTALL_PREFIX})
 
-add_custom_command(TARGET pyDOGIToys POST_BUILD
-    COMMAND
-        "python3"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+# add_custom_command(TARGET pyDOGIToys POST_BUILD
+#     COMMAND
+#         "python3"
+#         "${CMAKE_CURRENT_SOURCE_DIR}/test/test.py"
+#         "${CMAKE_CURRENT_SOURCE_DIR}/test/input"
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
