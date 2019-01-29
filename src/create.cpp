@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   args.addArgument("create", "Force database creation", avt::Bool, 'c');
   args.addArgument("features",
                    "File with genomic features. Forces database creation",
-                   avt::Single, 'f');
+                   avt::Single, 'a');
   args.addArgument("structural", "File with structural variants", avt::Single,
                    's');
   args.addArgument("ontology-terms", "File with ontology terms", avt::Single,
