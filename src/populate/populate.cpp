@@ -156,6 +156,8 @@ void DOGIToys::Populate::Populator::populateMGIMap(const QString map_file,
                                       "MGIMap (id_mgi, id_feature) "
                                       "VALUES (:id_mgi, :id_feature)");
 
+  transaction();
+
   while (auto line = reader()) {
     auto data = (*line).split("\t");
     const auto id_mgi = extractID(data[1], ':');
@@ -167,6 +169,8 @@ void DOGIToys::Populate::Populator::populateMGIMap(const QString map_file,
       Execute::exec(insert);
     }
   }
+
+  commit();
 }
 
 void DOGIToys::Populate::Populator::populateGeneOntologyTerms(

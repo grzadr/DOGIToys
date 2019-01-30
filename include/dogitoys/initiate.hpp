@@ -267,7 +267,7 @@ inline static QStringList MGIMap{
     ""
     "CONSTRAINT fk_MGIMap_feature "
     "FOREIGN KEY (id_feature) "
-    "REFERENCES GenomicFeatures (id_database, id_feature)"
+    "REFERENCES GenomicFeatures (id_feature)"
     ")",
 
     "CREATE INDEX MGIMap_id_feature ON MGIMap(id_feature)",
@@ -418,9 +418,9 @@ inline static QStringList StructuralVariants{
     ""
     ")",
 
-};  // namespace Schemas
+}; // namespace Schemas
 
-}  // namespace Schemas
+} // namespace Schemas
 
 using namespace Execute;
 
@@ -432,4 +432,4 @@ void init_map_uniprot(QSqlDatabase &db);
 void init_map_mgi(QSqlDatabase &db);
 void init_gene_ontology(QSqlDatabase &db);
 void init_structural_variants(QSqlDatabase &db);
-}  // namespace DOGIToys::Initiate
+} // namespace DOGIToys::Initiate

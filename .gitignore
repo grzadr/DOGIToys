@@ -1,4 +1,5 @@
 /build/
+/build-qt/
 /build-qtc/
 /qt-build/
 *.txt.user*

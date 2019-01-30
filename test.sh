@@ -18,7 +18,7 @@ time ./CreateDOGI "${DB_DIR}/${TAXON}.${ENSEMBL}.db" \
   -a "${DATA_DIR}/Ensembl/${ENSEMBL}/GeneAnnotations/${TAXON}/${ASSEMBLY}.${ENSEMBL}.gff3" \
   -f "${DATA_DIR}/Ensembl/${ENSEMBL}/Genomes/${TAXON}/${TAXON}.dna_sm.chroms.fa" \
   -s "${DATA_DIR}/Ensembl/${ENSEMBL}/Variants/${TAXON}/${TAXON}_structural_variations.gvf" \
-  -m "${DATA_DIR}/Ensembl/${ENSEMBL}/MGI/MGI_Gene_Model_Coord.rpt" \
+  -m "${DATA_DIR}/MGI/MGI_Gene_Model_Coord.rpt" \
   -t "${DATA_DIR}/GeneOntology/go.obo" \
   -o "${DATA_DIR}/MGI/gene_association.mgi" \
   
