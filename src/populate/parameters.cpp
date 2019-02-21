@@ -3,34 +3,39 @@
 using namespace DOGIToys;
 
 void Parameters::parse(const AGizmo::Args::Arguments &args) {
-  for (const auto &flag : args) {
-    if (flag.isEmpty())
-      continue;
 
-    if (const auto flag_name = flag.getName(); flag_name == "path")
-      path = QString::fromStdString(*flag.getValue());
-    else if (flag_name == "taxon")
-      taxon = QString::fromStdString(*flag.getValue());
-    else if (flag_name == "create")
-      create = true;
-    else if (flag_name == "features") {
-      genomic_features = QString::fromStdString(*flag.getValue());
-      create = true;
-    } else if (flag_name == "structural") {
-      structural_variants = QString::fromStdString(*flag.getValue());
-    } else if (flag_name == "uniprot-mapping") {
-      uniprot_mapping = QString::fromStdString(*flag.getValue());
-    } else if (flag_name == "mgi-mapping") {
-      mgi_mapping = QString::fromStdString(*flag.getValue());
-    } else if (flag_name == "mapping") {
-      mapping = QString::fromStdString(*flag.getValue());
-    } else if (flag_name == "ontology-terms") {
-      ontology_terms = QString::fromStdString(*flag.getValue());
-    } else if (flag_name == "ontology") {
-      ontology_annotation = QString::fromStdString(*flag.getValue());
-    } else if (flag_name == "fasta") {
-      sequences.append(QString::fromStdString(*flag.getValue()));
-    }
+  this->path = QString::fromStdString(*args.getValue("path"));
+
+  if (auto taxon = args.getValue("taxon"))
+    this->taxon = QString::fromStdString(*taxon);
+
+  this->create = args.isSet("create");
+
+  if (auto genomic_features = args.getValue("features")) {
+    this->genomic_features = QString::fromStdString(*genomic_features);
+    this->create = true;
+  }
+
+  if (auto structural_variants = args.getValue("structural"))
+    this->structural_variants = QString::fromStdString(*structural_variants);
+
+  if (auto uniprot_mapping = args.getValue("uniprot-mapping"))
+    this->uniprot_mapping = QString::fromStdString(*uniprot_mapping);
+
+  if (auto mgi_mapping = args.getValue("mgi-mapping"))
+    this->mgi_mapping = QString::fromStdString(*mgi_mapping);
+
+  if (auto mapping = args.getValue("mapping"))
+    this->mapping = QString::fromStdString(*mapping);
+
+  if (auto ontology_terms = args.getValue("ontology-terms"))
+    this->ontology_terms = QString::fromStdString(*ontology_terms);
+
+  if (auto ontology_annotation = args.getValue("ontology"))
+    this->ontology_annotation = QString::fromStdString(*ontology_annotation);
+
+  for (auto sequence : args.getIterable("fasta")) {
+    sequences.append(QString::fromStdString(sequence));
   }
 }
 

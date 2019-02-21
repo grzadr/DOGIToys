@@ -2,26 +2,20 @@
 #include <dogitoys/create.hpp>
 #include <dogitoys/populate/parameters.hpp>
 
-using avt = AGizmo::Args::ValueType;
-
 int main(int argc, char *argv[]) {
   AGizmo::Args::Arguments args{};
-  args.addArgument("path", "Path do database file", true);
-  args.addArgument("taxon", "Taxon ID/Name", false);
-  args.addArgument("create", "Force database creation", avt::Bool, 'c');
+  args.addPositional("path", "Path do database file", true);
+  args.addPositional("taxon", "Taxon ID/Name", false);
+  args.addSwitch("create", "Force database creation", 'c');
   args.addArgument("features",
-                   "File with genomic features. Forces database creation",
-                   avt::Single, 'a');
-  args.addArgument("structural", "File with structural variants", avt::Single,
-                   's');
-  args.addArgument("ontology-terms", "File with ontology terms", avt::Single,
-                   't');
-  args.addArgument("ontology", "File with ontology annotation", avt::Single,
-                   'o');
-  args.addArgument("uniprot-mapping", "Mapping for Uniprot", avt::Single, 'u');
-  args.addArgument("mgi-mapping", "Mapping for Uniprot", avt::Single, 'i');
-  args.addArgument("mapping", "Mapping", avt::Single, 'm');
-  args.addArgument("fasta", "FASTA with genomic sequences", avt::Single, 'f');
+                   "File with genomic features. Forces database creation", 'a');
+  args.addArgument("structural", "File with structural variants", 's');
+  args.addArgument("ontology-terms", "File with ontology terms", 't');
+  args.addArgument("ontology", "File with ontology annotation", 'o');
+  args.addArgument("uniprot-mapping", "Mapping for Uniprot", 'u');
+  args.addArgument("mgi-mapping", "Mapping for Uniprot", 'i');
+  args.addArgument("mapping", "Mapping", 'm');
+  args.addMulti("fasta", "FASTA with genomic sequences", 'f');
 
   args.parse(argc, argv);
 
