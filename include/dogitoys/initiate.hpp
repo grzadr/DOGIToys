@@ -418,6 +418,23 @@ inline static QStringList StructuralVariants{
     ""
     ")",
 
+    "CREATE INDEX idx_StructuralVariantsPosition ON "
+    "StructuralVariants(struct_seqid, struct_start, struct_end)",
+
+    "CREATE INDEX idx_StructuralVariantsType ON "
+    "StructuralVariants(struct_type)",
+
+    "CREATE INDEX idx_StructuralVariantsLength ON "
+    "StructuralVariants(struct_length)",
+
+    "CREATE INDEX idx_StructuralVariantsSignature ON "
+    "StructuralVariants(struct_signature)",
+
+    "CREATE INDEX idx_StructuralVariantsParentSignature ON "
+    "StructuralVariants(struct_parent_signature)",
+
+    "CREATE INDEX idx_StructuralVariantsStudy ON "
+    "StructuralVariants(struct_study)",
 }; // namespace Schemas
 
 } // namespace Schemas
