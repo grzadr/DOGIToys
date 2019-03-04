@@ -170,6 +170,8 @@ public:
   void populateStructuralVariants(const string gvf_file, bool overwrite) {
     populateStructuralVariants(QString::fromStdString(gvf_file), overwrite);
   }
+
+  void populateStructuralVariants(const QStringList gvf_files, bool overwrite);
 };
 
 } // namespace DOGIToys

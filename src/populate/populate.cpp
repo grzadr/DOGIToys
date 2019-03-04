@@ -225,18 +225,31 @@ void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
 }
 
 void DOGIToys::Populate::Populator::populateStructuralVariants(
+    const QStringList &gvf_files, bool overwrite) {
+  if (overwrite || !db->tables().contains("GeneStructuralVariants"))
+    initStructuralVariants();
+
+  qInfo() << "Populating Structural Variants";
+
+  for (const auto &gvf_file : gvf_files) {
+    populateStructuralVariants(gvf_file, false);
+  }
+}
+
+void DOGIToys::Populate::Populator::populateStructuralVariants(
     const QString &gvf_file, bool overwrite) {
   if (overwrite || !db->tables().contains("GeneStructuralVariants"))
     initStructuralVariants();
 
   qInfo() << "Populating Structural Variants";
 
-  HKL::GFF::GFFReader reader(gvf_file.toStdString());
-
   transaction();
 
+  int id_record = Select::select_max_id(*db, "StructuralVariants", "id_struct");
+
+  HKL::GFF::GFFReader reader(gvf_file.toStdString());
   while (const auto record = reader("#")) {
-    StructuralVariant temp(std::get<GFF::GFFRecord>(*record));
+    StructuralVariant temp(std::get<GFF::GFFRecord>(*record), ++id_record);
     temp.insert(*db);
     if (temp.getRecordID() % 100000 == 0)
       qInfo() << temp.getRecordID();
@@ -249,20 +262,22 @@ void DOGIToys::Populate::Populator::populate(
     const DOGIToys::Parameters &params) {
 
   if (params.hasFeatures())
-    populateGenomicFeatures(params.getFeatures(), true);
+    populateGenomicFeatures(params.getFeatures(), params.createDOGI());
 
   if (params.hasMapping())
-    populateMap(params.getMapping(), true);
+    populateMap(params.getMapping(), params.createDOGI());
   else if (params.hasUniprotMapping())
-    populateUniprotMap(params.getUniprotMapping(), true);
+    populateUniprotMap(params.getUniprotMapping(), params.createDOGI());
   else if (params.hasMGIMapping())
-    populateGenomicFeatures(params.getFeatures(), true);
+    populateGenomicFeatures(params.getFeatures(), params.createDOGI());
 
   if (params.hasOntologyTerms())
-    populateGeneOntologyTerms(params.getOntologyTerms(), true);
+    populateGeneOntologyTerms(params.getOntologyTerms(), params.createDOGI());
   if (params.hasOntologyAnnotation())
-    populateGeneOntologyAnnotation(params.getOntologyAnnotation(), true);
+    populateGeneOntologyAnnotation(params.getOntologyAnnotation(),
+                                   params.createDOGI());
 
-  if (params.hasStructural())
-    populateStructuralVariants(params.getStructural(), true);
+  if (params.hasStructural()) {
+    populateStructuralVariants(params.getStructural(), params.createDOGI());
+  }
 }

@@ -24,12 +24,12 @@ class Parameters {
 
   opt_qstr taxon;
   opt_qstr genomic_features{};
-  opt_qstr structural_variants{};
   opt_qstr ontology_terms{};
   opt_qstr ontology_annotation{};
   opt_qstr uniprot_mapping{};
   opt_qstr mgi_mapping{};
   opt_qstr mapping{};
+  QStringList structural_variants{};
   QStringList sequences{};
 
 public:
@@ -49,8 +49,8 @@ public:
   bool hasFeatures() const { return genomic_features.has_value(); }
   auto getFeatures() const { return *genomic_features; }
 
-  bool hasStructural() const { return structural_variants.has_value(); }
-  auto getStructural() const { return *structural_variants; }
+  bool hasStructural() const { return !structural_variants.empty(); }
+  auto getStructural() const { return structural_variants; }
 
   bool hasOntologyTerms() const { return ontology_terms.has_value(); }
   auto getOntologyTerms() const { return *ontology_terms; }

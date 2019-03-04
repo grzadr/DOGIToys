@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   args.addSwitch("create", "Force database creation", 'c');
   args.addArgument("features",
                    "File with genomic features. Forces database creation", 'a');
-  args.addArgument("structural", "File with structural variants", 's');
+  args.addMulti("structural", "File with structural variants", 's');
   args.addArgument("ontology-terms", "File with ontology terms", 't');
   args.addArgument("ontology", "File with ontology annotation", 'o');
   args.addArgument("uniprot-mapping", "Mapping for Uniprot", 'u');

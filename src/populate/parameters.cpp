@@ -16,8 +16,10 @@ void Parameters::parse(const AGizmo::Args::Arguments &args) {
     this->create = true;
   }
 
-  if (auto structural_variants = args.getValue("structural"))
-    this->structural_variants = QString::fromStdString(*structural_variants);
+  if (args.isSet("structural")) {
+    for (const auto &ele : args.getIterable("structural"))
+      this->structural_variants.append(QString::fromStdString(ele));
+  }
 
   if (auto uniprot_mapping = args.getValue("uniprot-mapping"))
     this->uniprot_mapping = QString::fromStdString(*uniprot_mapping);
@@ -44,8 +46,9 @@ QString DOGIToys::Parameters::str() const {
   result += "Taxon: " + (taxon.has_value() ? *taxon : "None");
   result += "Features: " +
             (genomic_features.has_value() ? *genomic_features : "None");
-  result += "Structural: " +
-            (structural_variants.has_value() ? *structural_variants : "None");
+  result +=
+      "Structural: " +
+      (structural_variants.empty() ? "None" : structural_variants.join(","));
   result += "Ontology Terms: " +
             (ontology_terms.has_value() ? *ontology_terms : "None");
   result += "Ontology Annotation: " +

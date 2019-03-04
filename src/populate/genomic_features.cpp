@@ -8,10 +8,9 @@ DOGIToys::Populate::QGFFRecord::QGFFRecord(HKL::GFF::GFFRecord record)
 void DOGIToys::Populate::insert_SeqID(QSqlDatabase &db, const QString &name,
                                       int first, int last) {
   auto insert =
-      Execute::prepare(db,
-                       "INSERT INTO SeqIDs "
-                       "(seqid_name, seqid_start, seqid_end, seqid_length)"
-                       "VALUES (:name, :first, :last, :length)");
+      Execute::prepare(db, "INSERT INTO SeqIDs "
+                           "(seqid_name, seqid_start, seqid_end, seqid_length)"
+                           "VALUES (:name, :first, :last, :length)");
 
   insert.bindValue(":name", name);
   insert.bindValue(":first", first);
@@ -24,24 +23,24 @@ void DOGIToys::Populate::insert_SeqID(QSqlDatabase &db, const QString &name,
 void DOGIToys::Populate::GenomicFeature::insert_feature() {
   id_feature = Select::select_max_id(db, "GenomicFeatures", "id_feature") + 1;
 
-  auto insert = Execute::prepare(db,
-                                 "INSERT INTO GenomicFeatures ("
-                                 "id_feature,"
-                                 "feature_seqid, feature_source, feature_type, "
-                                 "feature_start, feature_end, feature_length, "
-                                 "feature_score, feature_strand, feature_phase,"
-                                 "feature_id_parent, feature_signature,"
-                                 "feature_stable_id, "
-                                 "feature_name, feature_biotype"
-                                 ") "
-                                 "VALUES ("
-                                 ":id_feature, "
-                                 ":seqid, :source, :type, "
-                                 ":start, :end, :length, "
-                                 ":score, :strand, :phase,"
-                                 ":id_parent, :signature,"
-                                 ":stable_id, "
-                                 ":name, :biotype)");
+  auto insert =
+      Execute::prepare(db, "INSERT INTO GenomicFeatures ("
+                           "id_feature,"
+                           "feature_seqid, feature_source, feature_type, "
+                           "feature_start, feature_end, feature_length, "
+                           "feature_score, feature_strand, feature_phase,"
+                           "feature_id_parent, feature_signature,"
+                           "feature_stable_id, "
+                           "feature_name, feature_biotype"
+                           ") "
+                           "VALUES ("
+                           ":id_feature, "
+                           ":seqid, :source, :type, "
+                           ":start, :end, :length, "
+                           ":score, :strand, :phase,"
+                           ":id_parent, :signature,"
+                           ":stable_id, "
+                           ":name, :biotype)");
 
   insert.bindValue(":id_feature", id_feature);
   insert.bindValue(":seqid", QString::fromStdString(*record.getSeqID()));
@@ -115,12 +114,11 @@ void DOGIToys::Populate::GenomicFeature::insert_feature() {
 }
 
 void DOGIToys::Populate::GenomicFeature::insert_attributes() {
-  auto insert = Execute::prepare(db,
-                                 "INSERT INTO GenomicFeatureAttributes "
-                                 "(id_feature, "
-                                 "feature_attr_name, feature_attr_value) "
-                                 "VALUES ("
-                                 ":id_feature, :name, :value)");
+  auto insert = Execute::prepare(db, "INSERT INTO GenomicFeatureAttributes "
+                                     "(id_feature, "
+                                     "feature_attr_name, feature_attr_value) "
+                                     "VALUES ("
+                                     ":id_feature, :name, :value)");
   for (const auto &[key, value] : record) {
     insert.bindValue(":id_feature", id_feature);
     insert.bindValue(":name", QString::fromStdString(key));
@@ -131,15 +129,15 @@ void DOGIToys::Populate::GenomicFeature::insert_attributes() {
 
     Execute::exec(insert);
 
-    if (key == "Alias" and value.has_value()) insert_alias(*value);
+    if (key == "Alias" and value.has_value())
+      insert_alias(*value);
   }
 }
 
 void DOGIToys::Populate::GenomicFeature::insert_alias(const string &aliases) {
-  auto insert = Execute::prepare(db,
-                                 "INSERT INTO GenomicFeatureAliases "
-                                 "(id_feature, feature_alias)"
-                                 "VALUES (:id_feature, :alias)");
+  auto insert = Execute::prepare(db, "INSERT INTO GenomicFeatureAliases "
+                                     "(id_feature, feature_alias)"
+                                     "VALUES (:id_feature, :alias)");
 
   for (const auto &alias : QString::fromStdString(aliases).split(",")) {
     insert.bindValue(":id_feature", id_feature);
@@ -159,29 +157,29 @@ DOGIToys::Populate::GenomicFeature::GenomicFeature(QSqlDatabase &db,
     : db{db}, record{record} {}
 
 DOGIToys::Populate::StructuralVariant::StructuralVariant(
-    HKL::GFF::GFFRecord record)
+    HKL::GFF::GFFRecord record, int id_record)
     : QGFFRecord(record) {
-  id_record = std::stoi(*record.at("ID"));
-  signature = extractID(QString::fromStdString(*record.at("Dbxref")), ':');
+  this->id_record = id_record;
+  this->signature =
+      extractID(QString::fromStdString(*record.at("Dbxref")), ':');
 }
 
 void DOGIToys::Populate::StructuralVariant::insert(QSqlDatabase &db) {
-  auto query =
-      Execute::prepare(db,
-                       "INSERT INTO StructuralVariants ("
-                       "id_struct, struct_seqid, struct_source, struct_type, "
-                       "struct_start, struct_end, struct_length, struct_strand,"
-                       "struct_signature, struct_study, "
-                       "struct_parent_signature,"
-                       "struct_start_range_start, struct_start_range_end,"
-                       "struct_end_range_start, struct_end_range_end"
-                       ") VALUES ("
-                       ":id, :seqid, :source, :type, "
-                       ":start, :end, :length, :strand,"
-                       ":signature, :study, :parent_signature,"
-                       ":start_range_start, :start_range_end,"
-                       ":end_range_start, :end_range_end"
-                       ")");
+  auto query = Execute::prepare(
+      db, "INSERT INTO StructuralVariants ("
+          "id_struct, struct_seqid, struct_source, struct_type, "
+          "struct_start, struct_end, struct_length, struct_strand,"
+          "struct_signature, struct_study, "
+          "struct_parent_signature,"
+          "struct_start_range_start, struct_start_range_end,"
+          "struct_end_range_start, struct_end_range_end"
+          ") VALUES ("
+          ":id, :seqid, :source, :type, "
+          ":start, :end, :length, :strand,"
+          ":signature, :study, :parent_signature,"
+          ":start_range_start, :start_range_end,"
+          ":end_range_start, :end_range_end"
+          ")");
   bindMainValues(query, obligatory_fields);
   query.bindValue(":signature", signature);
   query.bindValue(":study", getStudy());

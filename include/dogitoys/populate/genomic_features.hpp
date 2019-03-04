@@ -13,7 +13,7 @@ using namespace HKL;
 void insert_SeqID(QSqlDatabase &db, const QString &name, int first, int last);
 
 class QGFFRecord {
- protected:
+protected:
   int id_record{0};
   GFF::GFFRecord record;
 
@@ -44,7 +44,7 @@ class QGFFRecord {
     }
   }
 
- public:
+public:
   QGFFRecord() = delete;
   QGFFRecord(GFF::GFFRecord record);
   virtual ~QGFFRecord() = default;
@@ -100,7 +100,7 @@ class QGFFRecord {
 };
 
 class GenomicFeature {
- private:
+private:
   QSqlDatabase &db;
   GFF::GFFRecord record;
   int id_feature{0};
@@ -109,7 +109,7 @@ class GenomicFeature {
   void insert_attributes();
   void insert_alias(const string &aliases);
 
- public:
+public:
   GenomicFeature() = delete;
   GenomicFeature(QSqlDatabase &db, GFF::GFFRecord record);
 
@@ -117,16 +117,16 @@ class GenomicFeature {
 };
 
 class StructuralVariant : public QGFFRecord {
- private:
+private:
   inline const static QStringList obligatory_fields{
       "id",  "seqid",  "source", "type",      "start",
       "end", "length", "strand", "signature", "study"};
 
   QString signature;
 
- public:
+public:
   StructuralVariant() = delete;
-  StructuralVariant(GFF::GFFRecord record);
+  StructuralVariant(GFF::GFFRecord record, int id_record);
 
   QVariant getStudy() const {
     if (const auto &study = record.get("study_accession"))
@@ -141,4 +141,4 @@ class StructuralVariant : public QGFFRecord {
   void bindEndRange(QSqlQuery &query) const;
 };
 
-}  // namespace DOGIToys::Populate
+} // namespace DOGIToys::Populate

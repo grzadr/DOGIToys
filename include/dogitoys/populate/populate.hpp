@@ -61,6 +61,7 @@ public:
   void populateGeneOntologyTerms(const QString &obo_file, bool overwrite);
   void populateGeneOntologyAnnotation(const QString file_name, bool overwrite);
 
+  void populateStructuralVariants(const QStringList &gvf_files, bool overwrite);
   void populateStructuralVariants(const QString &gvf_file, bool overwrite);
 
   void populate(const Parameters &params);
