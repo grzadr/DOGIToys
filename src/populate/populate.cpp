@@ -16,7 +16,7 @@ void DOGIToys::Populate::Populator::initGenomicFeatures() {
   Initiate::init_genomic_features(*db);
 }
 
-void DOGIToys::Populate::Populator::initGenomicSequences() {
+void DOGIToys::Populate::Populator::initSequences() {
   Initiate::init_genomic_sequences(*db);
 }
 
@@ -75,38 +75,41 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
   Transaction::commit(*db);
 }
 
-void DOGIToys::Populate::Populator::populateGenomicSequences(QString fasta_file,
-                                                             QString masking,
-                                                             bool initiate) {
+void DOGIToys::Populate::Populator::populateSequences(QStringList fasta_files,
+                                                      bool initiate) {
+  if (initiate || !db->tables().contains("Sequences"))
+    initSequences();
+
+  for (const auto &fasta_file : fasta_files)
+    populateSequences(fasta_file, false);
+}
+
+void DOGIToys::Populate::Populator::populateSequences(QString fasta_file,
+                                                      bool initiate) {
   qInfo() << "Populating GenomicSequences";
   qInfo() << "Reading FASTA" << fasta_file;
 
-  masking = masking.toLower();
-  if (masking != "hard" && masking != "soft" && masking != "none")
-    throw_runerror("Unsupported masking: " + masking);
-
-  if (initiate)
-    initGenomicSequences();
+  if (initiate || !db->tables().contains("Sequences"))
+    initSequences();
 
   HKL::FASTAReader reader(fasta_file.toStdString());
 
   Transaction::transaction(*db);
 
   while (const auto seq = reader.readSeq()) {
-    insertGenomicSequence(*seq, masking);
+    insertGenomicSequence(*seq);
   }
 
   Transaction::commit(*db);
 }
 
 void DOGIToys::Populate::Populator::insertGenomicSequence(
-    const HKL::RegionSeq &seq, const QString masking) {
-  auto insert = Execute::prepare(*db, "INSERT INTO GenomicSequences("
-                                      "id_sequence, sequence_masking,"
+    const HKL::RegionSeq &seq) {
+  auto insert = Execute::prepare(*db, "INSERT INTO Sequences("
+                                      "id_sequence,"
                                       "sequence_seq, sequence_length) "
-                                      "VALUES (:id, :masking, :seq, :length)");
+                                      "VALUES (:id, :seq, :length)");
   insert.bindValue(":id", QString::fromStdString(seq.getName()));
-  insert.bindValue(":masking", masking);
   insert.bindValue(":seq", QString::fromStdString(seq.getSeq()));
   insert.bindValue(":length", static_cast<int>(seq.size()));
 
@@ -278,6 +281,11 @@ void DOGIToys::Populate::Populator::populate(
                                    params.createDOGI());
 
   if (params.hasStructural()) {
-    populateStructuralVariants(params.getStructural(), params.createDOGI());
+    populateStructuralVariants(params.getStructural(),
+                               params.createStructural());
+  }
+
+  if (params.hasSequences()) {
+    populateSequences(params.getSequences(), params.createSequences());
   }
 }

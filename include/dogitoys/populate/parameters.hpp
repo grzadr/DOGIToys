@@ -21,6 +21,8 @@ class Parameters {
   QString path;
 
   bool create = false;
+  bool create_structural = false;
+  bool create_sequences = false;
 
   opt_qstr taxon;
   opt_qstr genomic_features{};
@@ -42,6 +44,8 @@ public:
 
   QString getPath() const { return path; }
   bool createDOGI() const { return create; }
+  bool createStructural() const { return create_structural; }
+  bool createSequences() const { return create_sequences; }
 
   bool hasTaxon() const { return taxon.has_value(); }
   QString getTaxon() const { return *taxon; }

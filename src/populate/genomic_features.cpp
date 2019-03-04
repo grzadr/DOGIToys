@@ -170,17 +170,18 @@ void DOGIToys::Populate::StructuralVariant::insert(QSqlDatabase &db) {
           "id_struct, struct_seqid, struct_source, struct_type, "
           "struct_start, struct_end, struct_length, struct_strand,"
           "struct_signature, struct_study, "
-          "struct_parent_signature,"
+          "struct_parent_signature, struct_id,"
           "struct_start_range_start, struct_start_range_end,"
           "struct_end_range_start, struct_end_range_end"
           ") VALUES ("
-          ":id, :seqid, :source, :type, "
+          ":id_struct, :seqid, :source, :type, "
           ":start, :end, :length, :strand,"
-          ":signature, :study, :parent_signature,"
+          ":signature, :study, :parent_signature, :id,"
           ":start_range_start, :start_range_end,"
           ":end_range_start, :end_range_end"
           ")");
   bindMainValues(query, obligatory_fields);
+  query.bindValue(":id_struct", id_record);
   query.bindValue(":signature", signature);
   query.bindValue(":study", getStudy());
   query.bindValue(":parent_signature", getParent());

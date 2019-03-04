@@ -135,12 +135,9 @@ public:
     populateGenomicFeatures(QString::fromStdString(gff3_file), initiate);
   }
 
-  void populateGenomicSequences(QString fasta_file, QString masking,
-                                bool overwrite = true);
-  void populateGenomicSequences(string fasta_file, string masking,
-                                bool overwrite = true) {
-    populateGenomicSequences(QString::fromStdString(fasta_file),
-                             QString::fromStdString(masking), overwrite);
+  void populateSequences(QString fasta_file, bool overwrite = true);
+  void populateSequences(string fasta_file, bool overwrite = true) {
+    populateSequences(QString::fromStdString(fasta_file), overwrite);
   }
 
   void populateMap(QString map_file, bool overwrite = true);

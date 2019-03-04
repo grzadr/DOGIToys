@@ -114,9 +114,8 @@ void DOGI::populateGenomicFeatures(QString gff3_file, bool initiate) {
   populator.populateGenomicFeatures(gff3_file, initiate);
 }
 
-void DOGI::populateGenomicSequences(QString fasta_file, QString masking,
-                                    bool overwrite) {
-  populator.populateGenomicSequences(fasta_file, masking, overwrite);
+void DOGI::populateSequences(QString fasta_file, bool overwrite) {
+  populator.populateSequences(fasta_file, overwrite);
 }
 
 void DOGI::populateMap(QString map_file, bool overwrite) {

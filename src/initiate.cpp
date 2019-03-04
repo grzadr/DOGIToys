@@ -11,9 +11,8 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase &db, QString taxons) {
   Execute::exec(db, Schemas::Taxons);
 
   if (taxons.isEmpty()) {
-    auto insert = prepare(db,
-                          "INSERT INTO Taxons (id_taxon, taxon_name) "
-                          "VALUES (:id_taxon, :taxon_name)");
+    auto insert = prepare(db, "INSERT INTO Taxons (id_taxon, taxon_name) "
+                              "VALUES (:id_taxon, :taxon_name)");
 
     for (const auto &[id_taxon, taxon_name] : Schemas::BasicTaxonIDs) {
       insert.bindValue(":id_taxon", id_taxon);
@@ -21,9 +20,8 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase &db, QString taxons) {
       exec(insert);
       if (taxon_name.contains(' ')) {
         auto insert_alias =
-            prepare(db,
-                    "INSERT INTO TaxonAliases (id_alias, id_taxon) "
-                    "VALUES (:id_alias, :id_taxon)");
+            prepare(db, "INSERT INTO TaxonAliases (id_alias, id_taxon) "
+                        "VALUES (:id_alias, :id_taxon)");
         insert_alias.bindValue(":id_alias",
                                QString(taxon_name).replace(' ', '_'));
         insert_alias.bindValue(":id_taxon", id_taxon);
@@ -32,9 +30,8 @@ void DOGIToys::Initiate::init_taxon(QSqlDatabase &db, QString taxons) {
       insert.finish();
     }
 
-    prepare(insert,
-            "INSERT INTO TaxonAliases (id_alias, id_taxon) "
-            "VALUES (:id_alias, :id_taxon)");
+    prepare(insert, "INSERT INTO TaxonAliases (id_alias, id_taxon) "
+                    "VALUES (:id_alias, :id_taxon)");
 
     for (const auto &[id_alias, id_taxon] : Schemas::BasicTaxonAliases) {
       insert.bindValue(":id_alias", id_alias);
@@ -66,9 +63,9 @@ void DOGIToys::Initiate::init_genomic_features(QSqlDatabase &db) {
 }
 
 void DOGIToys::Initiate::init_genomic_sequences(QSqlDatabase &db) {
-  qInfo() << "Initiating GenomicSequences";
+  qInfo() << "Initiating Sequences";
   Transaction::transaction(db);
-  Execute::exec(db, Schemas::GenomicSequences);
+  Execute::exec(db, Schemas::Sequences);
   Transaction::commit(db);
 }
 

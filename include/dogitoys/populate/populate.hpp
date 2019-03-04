@@ -28,7 +28,7 @@ private:
 
   void initTaxon();
   void initGenomicFeatures();
-  void initGenomicSequences();
+  void initSequences();
   void initUniprotMap();
   void initMGIMap();
   void initGeneOntology();
@@ -50,9 +50,10 @@ public:
   void initMain();
 
   void populateGenomicFeatures(QString gff3_file, bool initiate);
-  void populateGenomicSequences(QString fasta_file, QString masking,
-                                bool initiate);
-  void insertGenomicSequence(const HKL::RegionSeq &seq, const QString masking);
+
+  void populateSequences(QStringList fasta_files, bool initiate);
+  void populateSequences(QString fasta_file, bool initiate);
+  void insertGenomicSequence(const HKL::RegionSeq &seq);
 
   void populateMap(const QString map_file, bool overwrite);
   void populateUniprotMap(const QString map_file, bool overwrite);

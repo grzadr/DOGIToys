@@ -16,6 +16,8 @@ void Parameters::parse(const AGizmo::Args::Arguments &args) {
     this->create = true;
   }
 
+  this->create_structural = args.isSet("create-structural") || this->create;
+
   if (args.isSet("structural")) {
     for (const auto &ele : args.getIterable("structural"))
       this->structural_variants.append(QString::fromStdString(ele));
@@ -35,6 +37,8 @@ void Parameters::parse(const AGizmo::Args::Arguments &args) {
 
   if (auto ontology_annotation = args.getValue("ontology"))
     this->ontology_annotation = QString::fromStdString(*ontology_annotation);
+
+  this->create_sequences = args.isSet("create-sequences") || this->create;
 
   for (auto sequence : args.getIterable("fasta")) {
     sequences.append(QString::fromStdString(sequence));

@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   args.addSwitch("create", "Force database creation", 'c');
   args.addArgument("features",
                    "File with genomic features. Forces database creation", 'a');
-  args.addSwitch("init-structural",
+  args.addSwitch("create-structural",
                  "Force initialization of StructuralVariants table");
   args.addMulti("structural", "File with structural variants", 's');
   args.addArgument("ontology-terms", "File with ontology terms", 't');
@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
   args.addArgument("uniprot-mapping", "Mapping for Uniprot", 'u');
   args.addArgument("mgi-mapping", "Mapping for Uniprot", 'i');
   args.addArgument("mapping", "Mapping", 'm');
+  args.addSwitch("create-sequences", "Force initialization of Sequences table");
   args.addMulti("fasta", "FASTA with genomic sequences", 'f');
 
   args.parse(argc, argv);

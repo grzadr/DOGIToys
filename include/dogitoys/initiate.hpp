@@ -209,26 +209,27 @@ inline static QStringList GenomicFeatures{
     "ON GenomicFeatureAliases(feature_alias)",
 };
 
-inline static QStringList GenomicSequences{
-    "DROP TABLE IF EXISTS GenomicSequences",
-    "CREATE TABLE GenomicSequences ("
+inline static QStringList Sequences{
+    "DROP TABLE IF EXISTS Sequences",
+    "CREATE TABLE Sequences ("
     "id_sequence TEXT NOT NULL COLLATE NOCASE, "
-    "sequence_masking TEXT NOT NULL COLLATE NOCASE, "
     "sequence_seq TEXT NOT NULL COLLATE NOCASE, "
+    //    "sequence_masking TEXT NOT NULL COLLATE NOCASE, "
     "sequence_length INTEGER NOT NULL, "
     ""
-    "PRIMARY KEY (id_sequence, sequence_masking), "
+    "PRIMARY KEY (id_sequence), "
     ""
-    "CONSTRAINT typeof_length CHECK(TYPEOF(sequence_length) = 'integer'), "
+    "CONSTRAINT typeof_length CHECK(TYPEOF(sequence_length) = 'integer'),"
+    "CONSTRAINT value_length CHECK(sequence_length > 0) "
     ""
-    "CONSTRAINT values_masking "
-    "CHECK(sequence_masking IN ('hard', 'soft', 'none')), "
-    "CONSTRAINT length_seq CHECK(LENGTH(sequence_seq)), "
-    ""
-    "CONSTRAINT fk_Features_seqid "
-    "FOREIGN KEY (id_sequence) "
-    "REFERENCES SeqIDs (seqid_name) "
-    "ON DELETE CASCADE"
+    //    "CONSTRAINT values_masking "
+    //    "CHECK(sequence_masking IN ('hard', 'soft', 'none')), "
+    //    "CONSTRAINT length_seq CHECK(LENGTH(sequence_seq)), "
+    //    ""
+    //    "CONSTRAINT fk_Features_seqid "
+    //    "FOREIGN KEY (id_sequence) "
+    //    "REFERENCES SeqIDs (seqid_name) "
+    //    "ON DELETE CASCADE"
     ")",
 };
 
@@ -375,6 +376,7 @@ inline static QStringList StructuralVariants{
     "struct_signature TEXT NOT NULL COLLATE NOCASE,"
     "struct_study TEXT NOT NULL COLLATE NOCASE,"
     "struct_parent_signature TEXT DEFAULT NULL COLLATE NOCASE,"
+    "struct_id INTETEGER NOT NULL,"
     "struct_start_range_start INTEGER DEFAULT NULL,"
     "struct_start_range_end INTEGER DEFAULT NULL,"
     "struct_end_range_start INTEGER DEFAULT NULL,"
