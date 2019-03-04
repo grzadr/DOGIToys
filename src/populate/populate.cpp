@@ -226,7 +226,7 @@ void DOGIToys::Populate::Populator::populateGeneOntologyAnnotation(
 
 void DOGIToys::Populate::Populator::populateStructuralVariants(
     const QStringList &gvf_files, bool overwrite) {
-  if (overwrite || !db->tables().contains("GeneStructuralVariants"))
+  if (overwrite || !db->tables().contains("StructuralVariants"))
     initStructuralVariants();
 
   qInfo() << "Populating Structural Variants";
@@ -238,7 +238,7 @@ void DOGIToys::Populate::Populator::populateStructuralVariants(
 
 void DOGIToys::Populate::Populator::populateStructuralVariants(
     const QString &gvf_file, bool overwrite) {
-  if (overwrite || !db->tables().contains("GeneStructuralVariants"))
+  if (overwrite || !db->tables().contains("StructuralVariants"))
     initStructuralVariants();
 
   qInfo() << "Populating Structural Variants";

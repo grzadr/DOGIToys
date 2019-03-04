@@ -9,6 +9,8 @@ int main(int argc, char *argv[]) {
   args.addSwitch("create", "Force database creation", 'c');
   args.addArgument("features",
                    "File with genomic features. Forces database creation", 'a');
+  args.addSwitch("init-structural",
+                 "Force initialization of StructuralVariants table");
   args.addMulti("structural", "File with structural variants", 's');
   args.addArgument("ontology-terms", "File with ontology terms", 't');
   args.addArgument("ontology", "File with ontology annotation", 'o');
