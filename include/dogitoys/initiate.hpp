@@ -437,6 +437,9 @@ inline static QStringList StructuralVariants{
 
     "CREATE INDEX idx_StructuralVariantsStudy ON "
     "StructuralVariants(struct_study)",
+
+    "CREATE INDEX idxStructuralVariantsTypeAndSignature ON "
+    "StructuralVariants (struct_type, struct_signature)"
 }; // namespace Schemas
 
 } // namespace Schemas
