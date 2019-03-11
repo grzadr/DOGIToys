@@ -438,11 +438,14 @@ inline static QStringList StructuralVariants{
     "CREATE INDEX idx_StructuralVariantsStudy ON "
     "StructuralVariants(struct_study)",
 
-    "CREATE INDEX idxStructuralVariantsTypeAndSignature ON "
-    "StructuralVariants (struct_type, struct_signature)"
+    "CREATE INDEX idxStructuralVariantsTypeAndParentSignature ON "
+    "StructuralVariants (struct_type, struct_parent_signature)",
+	
+	"CREATE INDEX idxStructuralVariantsTypeAndSignature ON "
+    "StructuralVariants (struct_type, struct_signature)",
 
     "CREATE INDEX idxStructuralVariantsTypeAndLength ON "
-    "StructuralVariants (struct_type, struct_length)"
+    "StructuralVariants (struct_type, struct_length)",
 
     "CREATE INDEX idxStructuralVariantsTypeAndLoc ON "
     "StructuralVariants (struct_type, struct_seqid, struct_start, struct_end)"
