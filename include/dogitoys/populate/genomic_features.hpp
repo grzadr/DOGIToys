@@ -97,6 +97,8 @@ public:
     else
       return QVariant(QVariant::String);
   }
+
+  bool hasParent() const { return record.has("Parent"); }
 };
 
 class GenomicFeature {
@@ -126,7 +128,7 @@ private:
 
 public:
   StructuralVariant() = delete;
-  StructuralVariant(GFF::GFFRecord record, int id_record);
+  StructuralVariant(GFF::GFFRecord record);
 
   QVariant getStudy() const {
     if (const auto &study = record.get("study_accession"))
@@ -135,7 +137,8 @@ public:
       return QVariant(QVariant::String);
   }
 
-  void insert(QSqlDatabase &db);
+  void insert(QSqlDatabase &db, int id_record);
+  void insertChild(QSqlDatabase &db, int id_record);
   QString getSignature() const { return signature; }
   void bindStartRange(QSqlQuery &query) const;
   void bindEndRange(QSqlQuery &query) const;

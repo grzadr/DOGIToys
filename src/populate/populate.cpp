@@ -248,14 +248,20 @@ void DOGIToys::Populate::Populator::populateStructuralVariants(
 
   transaction();
 
+  int inserted = 0;
   int id_record = Select::select_max_id(*db, "StructuralVariants", "id_struct");
+  int id_child = Select::select_max_id(*db, "StructuralVariantsChildren",
+                                       "id_struct_child");
 
   HKL::GFF::GFFReader reader(gvf_file.toStdString());
   while (const auto record = reader("#")) {
-    StructuralVariant temp(std::get<GFF::GFFRecord>(*record), ++id_record);
-    temp.insert(*db);
-    if (temp.getRecordID() % 100000 == 0)
-      qInfo() << temp.getRecordID();
+    StructuralVariant temp(std::get<GFF::GFFRecord>(*record));
+    if (temp.hasParent())
+      temp.insertChild(*db, ++id_child);
+    else
+      temp.insert(*db, ++id_record);
+    if (++inserted % 100000 == 0)
+      qInfo() << inserted;
   }
 
   commit();

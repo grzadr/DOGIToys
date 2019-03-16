@@ -372,10 +372,8 @@ inline static QStringList StructuralVariants{
     "struct_end INT NOT NULL,"
     "struct_length INTEGER NOT NULL,"
     "struct_strand COLLATE NOCASE,"
-    "struct_id_parent INTEGER DEFAULT NULL,"
     "struct_signature TEXT NOT NULL COLLATE NOCASE,"
     "struct_study TEXT NOT NULL COLLATE NOCASE,"
-    "struct_parent_signature TEXT DEFAULT NULL COLLATE NOCASE,"
     "struct_id INTETEGER NOT NULL,"
     "struct_start_range_start INTEGER DEFAULT NULL,"
     "struct_start_range_end INTEGER DEFAULT NULL,"
@@ -384,9 +382,9 @@ inline static QStringList StructuralVariants{
     ""
     //    "CONSTRAINT unique_signature UNIQUE (struct_signature),"
     ""
-    "CONSTRAINT typeof_id_parent "
-    "CHECK(struct_id_parent IS NULL OR TYPEOF(struct_id_parent) = "
-    "'integer'),"
+    //    "CONSTRAINT typeof_id_parent "
+    //    "CHECK(struct_id_parent IS NULL OR TYPEOF(struct_id_parent) = "
+    //    "'integer'),"
     "CONSTRAINT typeof_start "
     "CHECK(TYPEOF(struct_start) = 'integer'),"
     "CONSTRAINT typeof_end "
@@ -406,18 +404,18 @@ inline static QStringList StructuralVariants{
     "CONSTRAINT fk_StructuralVariants_seqid "
     "FOREIGN KEY (struct_seqid) "
     "REFERENCES SeqIDs (seqid_name) "
-    "ON DELETE CASCADE, "
-    ""
-    "CONSTRAINT fk_StructuralVariants_id_parent "
-    "FOREIGN KEY (struct_id_parent) "
-    "REFERENCES StructuralVariants (id_struct) "
     "ON DELETE CASCADE "
     ""
+    //    "CONSTRAINT fk_StructuralVariants_id_parent "
+    //    "FOREIGN KEY (struct_id_parent) "
+    //    "REFERENCES StructuralVariants (id_struct) "
+    //    "ON DELETE CASCADE "
+    //    ""
     //    "CONSTRAINT fk_StructuralVariants_parent_signature "
     //    "FOREIGN KEY (struct_parent_signature) "
     //    "REFERENCES StructuralVariants (struct_signature) "
     //    "ON DELETE CASCADE"
-    ""
+    //    ""
     ")",
 
     "CREATE INDEX idx_StructuralVariantsPosition ON "
@@ -432,23 +430,109 @@ inline static QStringList StructuralVariants{
     "CREATE INDEX idx_StructuralVariantsSignature ON "
     "StructuralVariants(struct_signature)",
 
-    "CREATE INDEX idx_StructuralVariantsParentSignature ON "
-    "StructuralVariants(struct_parent_signature)",
-
     "CREATE INDEX idx_StructuralVariantsStudy ON "
     "StructuralVariants(struct_study)",
 
-    "CREATE INDEX idxStructuralVariantsTypeAndParentSignature ON "
-    "StructuralVariants (struct_type, struct_parent_signature)",
-	
-	"CREATE INDEX idxStructuralVariantsTypeAndSignature ON "
+    "CREATE INDEX idxStructuralVariantsTypeAndSignature ON "
     "StructuralVariants (struct_type, struct_signature)",
 
     "CREATE INDEX idxStructuralVariantsTypeAndLength ON "
     "StructuralVariants (struct_type, struct_length)",
 
     "CREATE INDEX idxStructuralVariantsTypeAndLoc ON "
-    "StructuralVariants (struct_type, struct_seqid, struct_start, struct_end)"
+    "StructuralVariants (struct_type, struct_seqid, struct_start, "
+    "struct_end)",
+
+    "DROP TABLE IF EXISTS StructuralVariantsChildren",
+
+    "CREATE TABLE StructuralVariantsChildren("
+    "id_struct_child INTEGER PRIMARY KEY NOT NULL,"
+    "struct_child_seqid TEXT NOT NULL COLLATE NOCASE,"
+    "struct_child_source TEXT COLLATE NOCASE,"
+    "struct_child_type TEXT NOT NULL COLLATE NOCASE,"
+    "struct_child_start INT NOT NULL,"
+    "struct_child_end INT NOT NULL,"
+    "struct_child_length INTEGER NOT NULL,"
+    "struct_child_strand COLLATE NOCASE,"
+    //    "struct_child_id_parent INTEGER DEFAULT NULL,"
+    "struct_child_signature TEXT NOT NULL COLLATE NOCASE,"
+    "struct_child_study TEXT NOT NULL COLLATE NOCASE,"
+    "struct_child_parent_signature TEXT NOT NULL COLLATE NOCASE,"
+    "struct_child_id INTETEGER NOT NULL,"
+    "struct_child_start_range_start INTEGER DEFAULT NULL,"
+    "struct_child_start_range_end INTEGER DEFAULT NULL,"
+    "struct_child_end_range_start INTEGER DEFAULT NULL,"
+    "struct_child_end_range_end INTEGER DEFAULT NULL,"
+    ""
+    //    "CONSTRAINT unique_signature UNIQUE (struct_signature),"
+    ""
+    //    "CONSTRAINT typeof_id_parent "
+    //    "CHECK(TYPEOF(struct_child_id_parent) = 'integer'),"
+    "CONSTRAINT typeof_start "
+    "CHECK(TYPEOF(struct_child_start) = 'integer'),"
+    "CONSTRAINT typeof_end "
+    "CHECK(TYPEOF(struct_child_end) = 'integer'),"
+    "CONSTRAINT typeof_length "
+    "CHECK(TYPEOF(struct_child_length) = 'integer'),"
+    ""
+    "CONSTRAINT length_type CHECK(LENGTH(struct_child_type)),"
+    "CONSTRAINT length_signature CHECK(LENGTH(struct_child_signature)),"
+
+    "CONSTRAINT value_start CHECK(struct_child_start > 0),"
+    "CONSTRAINT value_end CHECK(struct_child_end >= struct_child_start),"
+    "CONSTRAINT value_strand "
+    "CHECK(struct_child_strand IS NULL OR struct_child_strand IN ('+', '-')),"
+    ""
+    "CONSTRAINT fk_StructuralVariants_seqid "
+    "FOREIGN KEY (struct_child_seqid) "
+    "REFERENCES SeqIDs (seqid_name) "
+    "ON DELETE CASCADE "
+    ""
+    //    "CONSTRAINT fk_StructuralVariants_id_parent "
+    //    "FOREIGN KEY (struct_child_id_parent) "
+    //    "REFERENCES StructuralVariants (id_struct) "
+    //    "ON DELETE CASCADE "
+    //    ""
+    //    "CONSTRAINT fk_StructuralVariants_parent_signature "
+    //    "FOREIGN KEY (struct_parent_signature) "
+    //    "REFERENCES StructuralVariants (struct_signature) "
+    //    "ON DELETE CASCADE"
+    //    ""
+    ")",
+
+    "CREATE INDEX idx_StructuralVariantsChildrenPosition ON "
+    "StructuralVariantsChildren(struct_child_seqid, struct_child_start, "
+    "struct_child_end)",
+
+    "CREATE INDEX idx_StructuralVariantsChildrenType ON "
+    "StructuralVariantsChildren(struct_child_type)",
+
+    "CREATE INDEX idx_StructuralVariantsChildrenLength ON "
+    "StructuralVariantsChildren(struct_child_length)",
+
+    "CREATE INDEX idx_StructuralVariantsChildrenSignature ON "
+    "StructuralVariantsChildren(struct_child_signature)",
+
+    "CREATE INDEX idx_StructuralVariantsParentChildrenSignature ON "
+    "StructuralVariantsChildren(struct_child_parent_signature)",
+
+    "CREATE INDEX idx_StructuralVariantsChildrenStudy ON "
+    "StructuralVariantsChildren(struct_child_study)",
+
+    "CREATE INDEX idxStructuralVariantsChildrenTypeAndLength ON "
+    "StructuralVariantsChildren(struct_child_type, struct_child_length)",
+
+    "CREATE INDEX idxStructuralVariantsChildrenTypeAndSignature ON "
+    "StructuralVariantsChildren(struct_child_type, struct_child_signature)",
+
+    "CREATE INDEX idx_StructuralVariantsChildrenTypeParentSignature ON "
+    "StructuralVariantsChildren(struct_child_type, "
+    "struct_child_parent_signature)",
+
+    "CREATE INDEX idxStructuralVariantsChildrenTypeAndLoc ON "
+    "StructuralVariantsChildren(struct_child_type, struct_child_seqid, "
+    "struct_child_start, struct_child_end)",
+
 }; // namespace Schemas
 
 } // namespace Schemas

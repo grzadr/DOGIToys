@@ -157,34 +157,100 @@ DOGIToys::Populate::GenomicFeature::GenomicFeature(QSqlDatabase &db,
     : db{db}, record{record} {}
 
 DOGIToys::Populate::StructuralVariant::StructuralVariant(
-    HKL::GFF::GFFRecord record, int id_record)
+    HKL::GFF::GFFRecord record)
     : QGFFRecord(record) {
-  this->id_record = id_record;
   this->signature =
       extractID(QString::fromStdString(*record.at("Dbxref")), ':');
 }
 
-void DOGIToys::Populate::StructuralVariant::insert(QSqlDatabase &db) {
-  auto query = Execute::prepare(
-      db, "INSERT INTO StructuralVariants ("
-          "id_struct, struct_seqid, struct_source, struct_type, "
-          "struct_start, struct_end, struct_length, struct_strand,"
-          "struct_signature, struct_study, "
-          "struct_parent_signature, struct_id,"
-          "struct_start_range_start, struct_start_range_end,"
-          "struct_end_range_start, struct_end_range_end"
-          ") VALUES ("
-          ":id_struct, :seqid, :source, :type, "
-          ":start, :end, :length, :strand,"
-          ":signature, :study, :parent_signature, :id,"
-          ":start_range_start, :start_range_end,"
-          ":end_range_start, :end_range_end"
-          ")");
+void DOGIToys::Populate::StructuralVariant::insertChild(QSqlDatabase &db,
+                                                        int id_record) {
+  auto query = Execute::prepare(db, "INSERT INTO StructuralVariantsChildren ("
+                                    "id_struct_child, "
+                                    "struct_child_seqid, "
+                                    "struct_child_source, "
+                                    "struct_child_type, "
+                                    "struct_child_start, "
+                                    "struct_child_end, "
+                                    "struct_child_length, "
+                                    "struct_child_strand, "
+                                    "struct_child_signature, "
+                                    "struct_child_study, "
+                                    "struct_child_parent_signature, "
+                                    "struct_child_id, "
+                                    "struct_child_start_range_start, "
+                                    "struct_child_start_range_end, "
+                                    "struct_child_end_range_start, "
+                                    "struct_child_end_range_end"
+                                    ") VALUES ("
+                                    ":id_struct, "
+                                    ":seqid, "
+                                    ":source, "
+                                    ":type, "
+                                    ":start, "
+                                    ":end, "
+                                    ":length, "
+                                    ":strand, "
+                                    ":signature, "
+                                    ":study, "
+                                    ":parent_signature, "
+                                    ":id, "
+                                    ":start_range_start, "
+                                    ":start_range_end, "
+                                    ":end_range_start, "
+                                    ":end_range_end"
+                                    ")");
   bindMainValues(query, obligatory_fields);
   query.bindValue(":id_struct", id_record);
   query.bindValue(":signature", signature);
   query.bindValue(":study", getStudy());
   query.bindValue(":parent_signature", getParent());
+  bindStartRange(query);
+  bindEndRange(query);
+
+  Execute::exec(query);
+}
+
+void DOGIToys::Populate::StructuralVariant::insert(QSqlDatabase &db,
+                                                   int id_record) {
+
+  auto query = Execute::prepare(db, "INSERT INTO StructuralVariants ("
+                                    "id_struct, "
+                                    "struct_seqid, "
+                                    "struct_source, "
+                                    "struct_type, "
+                                    "struct_start, "
+                                    "struct_end, "
+                                    "struct_length, "
+                                    "struct_strand, "
+                                    "struct_signature, "
+                                    "struct_study, "
+                                    "struct_id, "
+                                    "struct_start_range_start, "
+                                    "struct_start_range_end, "
+                                    "struct_end_range_start, "
+                                    "struct_end_range_end"
+                                    ") VALUES ("
+                                    ":id_struct, "
+                                    ":seqid, "
+                                    ":source, "
+                                    ":type, "
+                                    ":start, "
+                                    ":end, "
+                                    ":length, "
+                                    ":strand, "
+                                    ":signature, "
+                                    ":study, "
+                                    ":id, "
+                                    ":start_range_start, "
+                                    ":start_range_end, "
+                                    ":end_range_start, "
+                                    ":end_range_end"
+                                    ")");
+  bindMainValues(query, obligatory_fields);
+  query.bindValue(":id_struct", id_record);
+  query.bindValue(":signature", signature);
+  query.bindValue(":study", getStudy());
   bindStartRange(query);
   bindEndRange(query);
 
