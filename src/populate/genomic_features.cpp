@@ -2,6 +2,36 @@
 
 #include <iostream>
 
+void DOGIToys::Populate::QGFFRecord::bindMainValues(QSqlQuery &query,
+                                                    const QStringList &fields) {
+  for (const auto &ele : fields) {
+    if (ele == "id")
+      query.bindValue(":id", getRecordID());
+    else if (ele == "seqid")
+      query.bindValue(":seqid", getSeqID());
+    else if (ele == "source")
+      query.bindValue(":source", getSource());
+    else if (ele == "type")
+      query.bindValue(":type", getType());
+    else if (ele == "start")
+      query.bindValue(":start", getStart());
+    else if (ele == "end")
+      query.bindValue(":end", getEnd());
+    else if (ele == "length")
+      query.bindValue(":length", getLength());
+    else if (ele == "score")
+      query.bindValue(":score", getScore());
+    else if (ele == "strand")
+      query.bindValue(":strand", getStrand());
+    else if (ele == "phase")
+      query.bindValue(":phase", getPhase());
+    else if (ele == "parent")
+      query.bindValue(":parent", getParent());
+    else if (ele == "name")
+      query.bindValue(":name", getName());
+  }
+}
+
 DOGIToys::Populate::QGFFRecord::QGFFRecord(HKL::GFF::GFFRecord record)
     : record{record} {}
 
@@ -22,7 +52,7 @@ void DOGIToys::Populate::insert_SeqID(QSqlDatabase &db, const QString &name,
 
 void DOGIToys::Populate::GenomicFeature::insertFeature(QSqlDatabase &db) {
   auto query = Execute::prepare(db, "INSERT INTO GenomicFeatures ("
-                                    "id_feature,"
+                                    "id_feature, "
                                     "feature_seqid, "
                                     "feature_source, "
                                     "feature_type, "
@@ -31,11 +61,11 @@ void DOGIToys::Populate::GenomicFeature::insertFeature(QSqlDatabase &db) {
                                     "feature_length, "
                                     "feature_score, "
                                     "feature_strand, "
-                                    "feature_phase,"
-                                    "feature_signature,"
+                                    "feature_phase, "
+                                    "feature_signature, "
                                     "feature_stable_id, "
                                     "feature_name, "
-                                    "feature_biotype"
+                                    "feature_biotype "
                                     ") "
                                     "VALUES ("
                                     ":id, "
@@ -47,13 +77,24 @@ void DOGIToys::Populate::GenomicFeature::insertFeature(QSqlDatabase &db) {
                                     ":length, "
                                     ":score, "
                                     ":strand, "
-                                    ":phase,"
-                                    ":signature,"
+                                    ":phase, "
+                                    ":signature, "
                                     ":stable_id, "
                                     ":name, "
                                     ":biotype)");
 
   bindMainValues(query, obligatory_fields);
+
+  //  qInfo() << getRecordID();
+  //  qInfo() << getSeqID();
+  //  qInfo() << getSource();
+  //  qInfo() << getType();
+  //  qInfo() << getStart();
+  //  qInfo() << getEnd();
+  //  qInfo() << getLength();
+  //  qInfo() << getStrand();
+  //  qInfo() << getPhase();
+  //  qInfo() << getScore();
 
   if (const auto signature = record.get("ID")) {
     query.bindValue(":signature", QString::fromStdString(*(*signature)));
@@ -73,7 +114,7 @@ void DOGIToys::Populate::GenomicFeature::insertFeature(QSqlDatabase &db) {
     query.bindValue(":stable_id", QVariant(QVariant::String));
   }
 
-  query.bindValue(":name", getName());
+  query.bindValue(":biotype", getBiotype());
 
   Execute::exec(query);
 }
@@ -113,8 +154,8 @@ void DOGIToys::Populate::GenomicFeature::insertAlias(QSqlDatabase &db,
 }
 
 void DOGIToys::Populate::GenomicFeature::insertChildFeature(QSqlDatabase &db) {
-  auto query = Execute::prepare(db, "INSERT INTO GenomicFeaturesChildren ("
-                                    "id_feature_child,"
+  auto query = Execute::prepare(db, "INSERT INTO GenomicFeatureChildren ("
+                                    "id_feature_child, "
                                     "feature_child_seqid, "
                                     "feature_child_source, "
                                     "feature_child_type, "
@@ -123,12 +164,13 @@ void DOGIToys::Populate::GenomicFeature::insertChildFeature(QSqlDatabase &db) {
                                     "feature_child_length, "
                                     "feature_child_score, "
                                     "feature_child_strand, "
-                                    "feature_child_phase,"
+                                    "feature_child_phase, "
                                     "feature_child_id_parent, "
-                                    "feature_child_signature,"
+                                    "feature_child_parent_signature, "
+                                    "feature_child_signature, "
                                     "feature_child_stable_id, "
                                     "feature_child_name, "
-                                    "feature_child_biotype"
+                                    "feature_child_biotype "
                                     ") "
                                     "VALUES ("
                                     ":id, "
@@ -142,7 +184,8 @@ void DOGIToys::Populate::GenomicFeature::insertChildFeature(QSqlDatabase &db) {
                                     ":strand, "
                                     ":phase,"
                                     ":id_parent, "
-                                    ":signature,"
+                                    ":parent, "
+                                    ":signature, "
                                     ":stable_id, "
                                     ":name, "
                                     ":biotype)");
@@ -167,9 +210,9 @@ void DOGIToys::Populate::GenomicFeature::insertChildFeature(QSqlDatabase &db) {
     query.bindValue(":stable_id", QVariant(QVariant::String));
   }
 
-  query.bindValue(":name", getName());
-
   const auto parent = *(*record.get("Parent"));
+
+  query.bindValue(":parent", QString::fromStdString(parent));
 
   if (const auto id_parent = Select::select_id(
           db, "GenomicFeatures", "id_feature", "feature_signature",
@@ -183,6 +226,8 @@ void DOGIToys::Populate::GenomicFeature::insertChildFeature(QSqlDatabase &db) {
     query.bindValue(":id_parent", id_parent);
   else
     throw_runerror("Parent" + parent + " not found!");
+
+  query.bindValue(":biotype", getBiotype());
 
   Execute::exec(query);
 }
@@ -269,7 +314,7 @@ void DOGIToys::Populate::StructuralVariant::insertChild(QSqlDatabase &db,
                                     "struct_child_end_range_start, "
                                     "struct_child_end_range_end"
                                     ") VALUES ("
-                                    ":id_struct, "
+                                    ":id, "
                                     ":seqid, "
                                     ":source, "
                                     ":type, "
@@ -287,7 +332,7 @@ void DOGIToys::Populate::StructuralVariant::insertChild(QSqlDatabase &db,
                                     ":end_range_end"
                                     ")");
   bindMainValues(query, obligatory_fields);
-  query.bindValue(":id_struct", id_record);
+  query.bindValue(":id", id_record);
   query.bindValue(":signature", signature);
   query.bindValue(":study", getStudy());
   query.bindValue(":parent_signature", getParent());

@@ -97,7 +97,7 @@ inline static QStringList GenomicFeatures{
     "feature_length INTEGER NOT NULL,"
     "feature_score REAL DEFAULT NULL,"
     "feature_strand TEXT DEFAULT NULL COLLATE NOCASE,"
-    "feature_phase INT DEFAULT NULL,"
+    "feature_phase INTEGER DEFAULT NULL,"
     //    "feature_id_parent INTEGER,"
     "feature_signature TEXT DEFAULT NULL COLLATE NOCASE,"
     "feature_stable_id TEXT DEFAULT NULL COLLATE NOCASE,"
@@ -202,9 +202,6 @@ inline static QStringList GenomicFeatures{
     "ON DELETE CASCADE"
     ")",
 
-    "CREATE INDEX idx_GFF3FeatureAliases_alias "
-    "ON GenomicFeatureAliases(feature_alias)",
-
     "CREATE TABLE GenomicFeatureChildren("
     "id_feature_child INTEGER PRIMARY KEY NOT NULL,"
     "feature_child_seqid TEXT NOT NULL COLLATE NOCASE,"
@@ -214,11 +211,11 @@ inline static QStringList GenomicFeatures{
     "feature_child_end INT NOT NULL,"
     "feature_child_length INTEGER NOT NULL,"
     "feature_child_score REAL,"
-    "feature_child_strand COLLATE NOCASE,"
+    "feature_child_strand TEXT DEFAULT NULL COLLATE NOCASE,"
     "feature_child_phase INT,"
-    "feature_child_id_parent INTEGER,"
-    "feature_child_signature TEXT COLLATE NOCASE,"
-    "feature_child_parent_signature TEXT COLLATE NOCASE,"
+    "feature_child_id_parent INTEGER NOT NULL,"
+    "feature_child_signature TEXT DEFAULT NULL COLLATE NOCASE,"
+    "feature_child_parent_signature TEXT DEFAULT NULL COLLATE NOCASE,"
     "feature_child_stable_id TEXT COLLATE NOCASE,"
     "feature_child_name TEXT COLLATE NOCASE,"
     "feature_child_biotype TEXT COLLATE NOCASE,"
@@ -270,10 +267,10 @@ inline static QStringList GenomicFeatures{
     //    "CREATE INDEX idx_GenomicFeatures_end ON "
     //    "GenomicFeatures(feature_child_end)",
     "CREATE INDEX idx_GenomicFeatureChildren_name ON "
-    "GenomicFeatureChildrenChildren(feature_child_name)",
+    "GenomicFeatureChildren(feature_child_name)",
     "CREATE INDEX idx_GenomicFeatureChildren_signature ON "
     "GenomicFeatureChildren(feature_child_signature)",
-    "CREATE INDEX idx_GenomicFeatures_stable_id ON "
+    "CREATE INDEX idx_GenomicFeatureChildren_stable_id ON "
     "GenomicFeatureChildren(feature_child_stable_id)",
     "CREATE INDEX idx_GenomicFeatureChildren_parent ON "
     "GenomicFeatureChildren(feature_child_id_parent)",
@@ -315,10 +312,10 @@ inline static QStringList GenomicFeatures{
 
     "DROP TABLE IF EXISTS GenomicFeatureChildrenAliases",
     "CREATE TABLE GenomicFeatureChildrenAliases("
-    "id__childfeature INTEGER NOT NULL,"
+    "id_feature_child INTEGER NOT NULL,"
     "feature_child_alias TEXT NOT NULL,"
     ""
-    "PRIMARY KEY (feature_alias, id_feature),"
+    "PRIMARY KEY (feature_child_alias, id_feature_child),"
     ""
     "CONSTRAINT length_alias CHECK(LENGTH(feature_child_alias)),"
     ""

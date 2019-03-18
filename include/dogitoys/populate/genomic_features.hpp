@@ -17,34 +17,7 @@ protected:
   int id_record{0};
   GFF::GFFRecord record;
 
-  void bindMainValues(QSqlQuery &query, const QStringList &fields) {
-    for (const auto &ele : fields) {
-      if (ele == "id")
-        query.bindValue(":id", getID());
-      else if (ele == "seqid")
-        query.bindValue(":seqid", getSeqID());
-      else if (ele == "source")
-        query.bindValue(":source", getSource());
-      else if (ele == "type")
-        query.bindValue(":type", getType());
-      else if (ele == "start")
-        query.bindValue(":start", getStart());
-      else if (ele == "end")
-        query.bindValue(":end", getEnd());
-      else if (ele == "length")
-        query.bindValue(":length", getLength());
-      else if (ele == "score")
-        query.bindValue(":score", getScore());
-      else if (ele == "strand")
-        query.bindValue(":strand", getStrand());
-      else if (ele == "phase")
-        query.bindValue(":phase", getPhase());
-      else if (ele == "parent")
-        query.bindValue(":parent", getParent());
-      else if (ele == "name")
-        query.bindValue(":name", getName());
-    }
-  }
+  void bindMainValues(QSqlQuery &query, const QStringList &fields);
 
 public:
   QGFFRecord() = delete;
@@ -52,7 +25,7 @@ public:
   virtual ~QGFFRecord() = default;
 
   int getRecordID() const { return id_record; }
-  QString getID() const { return QString::fromStdString(*record.at("ID")); }
+  //  QString getID() const { return QString::fromStdString(*record.at("ID")); }
   QString getSeqID() const {
     return QString::fromStdString(*record.getSeqID());
   }
@@ -110,29 +83,11 @@ public:
   }
 };
 
-// Old implementation
-// class GenomicFeature {
-// private:
-//  QSqlDatabase &db;
-//  GFF::GFFRecord record;
-//  int id_feature{0};
-
-//  void insert_feature();
-//  void insert_attributes();
-//  void insert_alias(const string &aliases);
-
-// public:
-//  GenomicFeature() = delete;
-//  GenomicFeature(QSqlDatabase &db, GFF::GFFRecord record);
-
-//  void insert(int id_record);
-//};
-
 class GenomicFeature : public QGFFRecord {
 private:
   inline const static QStringList obligatory_fields{
-      "id",  "seqid",  "source", "type",      "start",
-      "end", "length", "strand", "signature", "study"};
+      "id",     "seqid", "source", "type",      "start", "end",
+      "length", "phase", "strand", "signature", "name"};
 
   void insertFeature(QSqlDatabase &db);
   void insertAttributes(QSqlDatabase &db);
@@ -148,6 +103,13 @@ public:
 
   void insert(QSqlDatabase &db, int id_record);
   void insertChild(QSqlDatabase &db, int id_record);
+
+  QVariant getBiotype() const {
+    if (const auto &parent = record.get("biotype"))
+      return QString::fromStdString(*parent.value());
+    else
+      return QVariant(QVariant::String);
+  }
 };
 
 class StructuralVariant : public QGFFRecord {

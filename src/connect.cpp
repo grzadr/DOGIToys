@@ -50,6 +50,8 @@ void DOGI::open(const QString &path, bool create) {
   else
     qInfo() << "Connected!";
 
+  open_sqlite();
+
   if (create)
     populator.initMain();
 }

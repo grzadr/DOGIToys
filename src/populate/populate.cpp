@@ -61,7 +61,7 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
 
   int id_record = Select::select_max_id(*db, "GenomicFeatures", "id_feature");
   int id_child =
-      Select::select_max_id(*db, "GenomicFeaturesChildren", "id_feature_child");
+      Select::select_max_id(*db, "GenomicFeatureChildren", "id_feature_child");
 
   while (auto record = reader()) {
     if ((*record).index() == 0) {
@@ -72,12 +72,12 @@ void DOGIToys::Populate::Populator::populateGenomicFeatures(QString gff3_file,
     } else {
       GenomicFeature feature(std::move(std::get<1>(*record)));
       if (feature.hasParent())
+        feature.insertChild(*db, ++id_child);
+      else {
         feature.insert(*db, ++id_record);
-      else
-        feature.insert(*db, ++id_child);
-
-      if (id_record % 50000 == 0)
-        qInfo() << id_record;
+        if (id_record % 5000 == 0)
+          qInfo() << id_record;
+      }
     }
   }
 
