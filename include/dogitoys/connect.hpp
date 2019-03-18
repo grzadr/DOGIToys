@@ -38,8 +38,12 @@ private:
 
   Populate::Populator populator{};
 
-  inline const static QStringList sqlite_opening{"PRAGMA encoding = 'UTF-8';",
-                                                 "PRAGMA foreign_keys = 1;"};
+  inline const static QStringList sqlite_opening{
+      "PRAGMA encoding = 'UTF-8';",
+      "PRAGMA foreign_keys = 1;",
+      "PRAGMA journal_mode = MEMORY;",
+      "PRAGMA locking_mode = EXCLUSIVE;",
+  };
 
   inline const static QStringList sqlite_closing{
 
@@ -52,6 +56,7 @@ private:
   inline const static QStringList sqlite_integrity{
       "PRAGMA foreign_key_check;",
       "PRAGMA integrity_check;",
+
   };
 
   void open_sqlite() { this->exec(sqlite_opening); }

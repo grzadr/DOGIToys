@@ -41,6 +41,8 @@ protected:
         query.bindValue(":phase", getPhase());
       else if (ele == "parent")
         query.bindValue(":parent", getParent());
+      else if (ele == "name")
+        query.bindValue(":name", getName());
     }
   }
 
@@ -99,23 +101,53 @@ public:
   }
 
   bool hasParent() const { return record.has("Parent"); }
+
+  QVariant getName() const {
+    if (const auto &parent = record.get("Name"))
+      return QString::fromStdString(*parent.value());
+    else
+      return QVariant(QVariant::String);
+  }
 };
 
-class GenomicFeature {
-private:
-  QSqlDatabase &db;
-  GFF::GFFRecord record;
-  int id_feature{0};
+// Old implementation
+// class GenomicFeature {
+// private:
+//  QSqlDatabase &db;
+//  GFF::GFFRecord record;
+//  int id_feature{0};
 
-  void insert_feature();
-  void insert_attributes();
-  void insert_alias(const string &aliases);
+//  void insert_feature();
+//  void insert_attributes();
+//  void insert_alias(const string &aliases);
+
+// public:
+//  GenomicFeature() = delete;
+//  GenomicFeature(QSqlDatabase &db, GFF::GFFRecord record);
+
+//  void insert(int id_record);
+//};
+
+class GenomicFeature : public QGFFRecord {
+private:
+  inline const static QStringList obligatory_fields{
+      "id",  "seqid",  "source", "type",      "start",
+      "end", "length", "strand", "signature", "study"};
+
+  void insertFeature(QSqlDatabase &db);
+  void insertAttributes(QSqlDatabase &db);
+  void insertAlias(QSqlDatabase &db, const string &aliases);
+
+  void insertChildFeature(QSqlDatabase &db);
+  void insertChildAttributes(QSqlDatabase &db);
+  void insertChildAlias(QSqlDatabase &db, const string &aliases);
 
 public:
   GenomicFeature() = delete;
-  GenomicFeature(QSqlDatabase &db, GFF::GFFRecord record);
+  GenomicFeature(GFF::GFFRecord record);
 
-  int insert();
+  void insert(QSqlDatabase &db, int id_record);
+  void insertChild(QSqlDatabase &db, int id_record);
 };
 
 class StructuralVariant : public QGFFRecord {

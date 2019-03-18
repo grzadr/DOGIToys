@@ -84,7 +84,9 @@ inline static QStringList SeqIDs{
 };
 
 inline static QStringList GenomicFeatures{
+    "DROP TABLE IF EXISTS GenomicFeatureChildren",
     "DROP TABLE IF EXISTS GenomicFeatures",
+
     "CREATE TABLE GenomicFeatures("
     "id_feature INTEGER PRIMARY KEY NOT NULL,"
     "feature_seqid TEXT NOT NULL COLLATE NOCASE,"
@@ -93,18 +95,18 @@ inline static QStringList GenomicFeatures{
     "feature_start INT NOT NULL,"
     "feature_end INT NOT NULL,"
     "feature_length INTEGER NOT NULL,"
-    "feature_score REAL,"
-    "feature_strand COLLATE NOCASE,"
-    "feature_phase INT,"
-    "feature_id_parent INTEGER,"
-    "feature_signature TEXT COLLATE NOCASE,"
-    "feature_stable_id TEXT COLLATE NOCASE,"
-    "feature_name TEXT COLLATE NOCASE,"
-    "feature_biotype TEXT COLLATE NOCASE,"
+    "feature_score REAL DEFAULT NULL,"
+    "feature_strand TEXT DEFAULT NULL COLLATE NOCASE,"
+    "feature_phase INT DEFAULT NULL,"
+    //    "feature_id_parent INTEGER,"
+    "feature_signature TEXT DEFAULT NULL COLLATE NOCASE,"
+    "feature_stable_id TEXT DEFAULT NULL COLLATE NOCASE,"
+    "feature_name TEXT DEFAULT NULL COLLATE NOCASE,"
+    "feature_biotype TEXT DEFAULT NULL COLLATE NOCASE,"
     ""
-    "CONSTRAINT typeof_id_parent "
-    "CHECK(feature_id_parent IS NULL OR TYPEOF(feature_id_parent) = "
-    "'integer'),"
+    //    "CONSTRAINT typeof_id_parent "
+    //    "CHECK(feature_id_parent IS NULL OR TYPEOF(feature_id_parent) = "
+    //    "'integer'),"
     "CONSTRAINT typeof_start "
     "CHECK(TYPEOF(feature_start) = 'integer'),"
     "CONSTRAINT typeof_end "
@@ -128,33 +130,28 @@ inline static QStringList GenomicFeatures{
     "CONSTRAINT fk_GenomicAnnotation_seqid "
     "FOREIGN KEY (feature_seqid) "
     "REFERENCES SeqIDs (seqid_name) "
-    "ON DELETE CASCADE,"
-    ""
-    "CONSTRAINT fk_Features_id_parent "
-    "FOREIGN KEY (feature_id_parent) "
-    "REFERENCES GenomicFeatures (id_feature) "
     "ON DELETE CASCADE"
     ""
     ")",
 
-    "CREATE INDEX idx_GenomicFeatures_seqid ON "
-    "GenomicFeatures(feature_seqid)",
+    "CREATE INDEX idx_GenomicFeatures_loc ON "
+    "GenomicFeatures(feature_seqid, feature_start, feature_end)",
     "CREATE INDEX idx_GenomicFeatures_source ON "
     "GenomicFeatures(feature_source)",
     "CREATE INDEX idx_GenomicFeatures_type ON "
     "GenomicFeatures(feature_type)",
-    "CREATE INDEX idx_GenomicFeatures_start ON "
-    "GenomicFeatures(feature_start)",
-    "CREATE INDEX idx_GenomicFeatures_end ON "
-    "GenomicFeatures(feature_end)",
+    //    "CREATE INDEX idx_GenomicFeatures_start ON "
+    //    "GenomicFeatures(feature_start)",
+    //    "CREATE INDEX idx_GenomicFeatures_end ON "
+    //    "GenomicFeatures(feature_end)",
     "CREATE INDEX idx_GenomicFeatures_name ON "
     "GenomicFeatures(feature_name)",
     "CREATE INDEX idx_GenomicFeatures_signature ON "
     "GenomicFeatures(feature_signature)",
     "CREATE INDEX idx_GenomicFeatures_stable_id ON "
     "GenomicFeatures(feature_stable_id)",
-    "CREATE INDEX idx_GenomicFeatures_parent ON "
-    "GenomicFeatures(feature_id_parent)",
+    //    "CREATE INDEX idx_GenomicFeatures_parent ON "
+    //    "GenomicFeatures(feature_id_parent)",
     "CREATE INDEX idx_GenomicFeatures_biotype ON "
     "GenomicFeatures(feature_biotype)",
 
@@ -207,6 +204,129 @@ inline static QStringList GenomicFeatures{
 
     "CREATE INDEX idx_GFF3FeatureAliases_alias "
     "ON GenomicFeatureAliases(feature_alias)",
+
+    "CREATE TABLE GenomicFeatureChildren("
+    "id_feature_child INTEGER PRIMARY KEY NOT NULL,"
+    "feature_child_seqid TEXT NOT NULL COLLATE NOCASE,"
+    "feature_child_source TEXT COLLATE NOCASE,"
+    "feature_child_type TEXT NOT NULL COLLATE NOCASE,"
+    "feature_child_start INT NOT NULL,"
+    "feature_child_end INT NOT NULL,"
+    "feature_child_length INTEGER NOT NULL,"
+    "feature_child_score REAL,"
+    "feature_child_strand COLLATE NOCASE,"
+    "feature_child_phase INT,"
+    "feature_child_id_parent INTEGER,"
+    "feature_child_signature TEXT COLLATE NOCASE,"
+    "feature_child_parent_signature TEXT COLLATE NOCASE,"
+    "feature_child_stable_id TEXT COLLATE NOCASE,"
+    "feature_child_name TEXT COLLATE NOCASE,"
+    "feature_child_biotype TEXT COLLATE NOCASE,"
+    ""
+    "CONSTRAINT typeof_child_id_parent "
+    "CHECK(TYPEOF(feature_child_id_parent) = 'integer'),"
+    "CONSTRAINT typeof_child_start "
+    "CHECK(TYPEOF(feature_child_start) = 'integer'),"
+    "CONSTRAINT typeof_child_end "
+    "CHECK(TYPEOF(feature_child_end) = 'integer'),"
+    "CONSTRAINT typeof_child_length "
+    "CHECK(TYPEOF(feature_child_length) = 'integer'),"
+    ""
+    "CONSTRAINT length_child_type CHECK(LENGTH(feature_child_type)),"
+    "CONSTRAINT length_child_signature "
+    "CHECK(feature_child_signature IS NULL OR LENGTH(feature_child_signature)),"
+    "CONSTRAINT length_child_name "
+    "CHECK(feature_child_name IS NULL OR LENGTH(feature_child_name)),"
+    "CONSTRAINT length_child_biotype "
+    "CHECK(feature_child_biotype IS NULL OR LENGTH(feature_child_biotype)),"
+
+    "CONSTRAINT value_child_start CHECK(feature_child_start > 0),"
+    "CONSTRAINT value_child_end CHECK(feature_child_end >= "
+    "feature_child_start),"
+    "CONSTRAINT value_child_strand "
+    "CHECK(feature_child_strand IS NULL OR feature_child_strand IN ('+', '-')),"
+    ""
+    "CONSTRAINT fk_GenomicAnnotation_seqid "
+    "FOREIGN KEY (feature_child_seqid) "
+    "REFERENCES SeqIDs (seqid_name) "
+    "ON DELETE CASCADE,"
+    ""
+    "CONSTRAINT fk_Features_id_parent "
+    "FOREIGN KEY (feature_child_id_parent) "
+    "REFERENCES GenomicFeatures (id_feature) "
+    "ON DELETE CASCADE"
+    ""
+    ")",
+
+    "CREATE INDEX idx_GenomicFeatureChildren_loc ON "
+    "GenomicFeatureChildren(feature_child_seqid, feature_child_start, "
+    "feature_child_end)",
+    "CREATE INDEX idx_GenomicFeatureChildren_source ON "
+    "GenomicFeatureChildren(feature_child_source)",
+    "CREATE INDEX idx_GenomicFeatureChildren_type ON "
+    "GenomicFeatureChildren(feature_child_type)",
+    //    "CREATE INDEX idx_GenomicFeatures_start ON "
+    //    "GenomicFeatures(feature_child_start)",
+    //    "CREATE INDEX idx_GenomicFeatures_end ON "
+    //    "GenomicFeatures(feature_child_end)",
+    "CREATE INDEX idx_GenomicFeatureChildren_name ON "
+    "GenomicFeatureChildrenChildren(feature_child_name)",
+    "CREATE INDEX idx_GenomicFeatureChildren_signature ON "
+    "GenomicFeatureChildren(feature_child_signature)",
+    "CREATE INDEX idx_GenomicFeatures_stable_id ON "
+    "GenomicFeatureChildren(feature_child_stable_id)",
+    "CREATE INDEX idx_GenomicFeatureChildren_parent ON "
+    "GenomicFeatureChildren(feature_child_id_parent)",
+    "CREATE INDEX idx_GenomicFeatureChildren_biotype ON "
+    "GenomicFeatureChildren(feature_child_biotype)",
+
+    "DROP TABLE IF EXISTS GenomicFeatureChildrenAttributes",
+    "CREATE TABLE GenomicFeatureChildrenAttributes ("
+    "id_feature_child INTEGER NOT NULL,"
+    "feature_child_attr_name TEXT NOT NULL COLLATE NOCASE,"
+    "feature_child_attr_value TEXT NOT NULL COLLATE NOCASE,"
+    ""
+    "PRIMARY KEY (id_feature_child, feature_child_attr_name),"
+    ""
+    "CONSTRAINT fk_GenomicFeatureChildrenAttributes_id_feature "
+    "FOREIGN KEY (id_feature_child) "
+    "REFERENCES GenomicChildrenFeatures(id_feature_child) "
+    "ON DELETE CASCADE"
+    ")",
+
+    "CREATE INDEX idx_GenomicFeatureChildrenAttributes_name_value ON "
+    "GenomicFeatureChildrenAttributes(feature_child_attr_name, "
+    "feature_child_attr_value)",
+
+    //    "DROP TABLE IF EXISTS GenomicFeatureIDs",
+    //    "CREATE TABLE GenomicFeatureIDs("
+    //    "id_feature INTEGER NOT NULL,"
+    //    "id_system TEXT NOT NULL COLLATE NOCASE,"
+    //    "feature_idx TEXT NOT NULL COLLATE NOCASE,"
+    //    ""
+    //    "PRIMARY KEY (id_system, feature_idx, id_feature),"
+    //    ""
+    //    "CONSTRAINT length_feature_idx_length CHECK(LENGTH(feature_idx)),"
+    //    ""
+    //    "CONSTRAINT fk_GenomicFeatureIDs_feature "
+    //    "FOREIGN KEY (id_feature) "
+    //    "REFERENCES GenomicFeatures (id_feature)"
+    //    ")",
+
+    "DROP TABLE IF EXISTS GenomicFeatureChildrenAliases",
+    "CREATE TABLE GenomicFeatureChildrenAliases("
+    "id__childfeature INTEGER NOT NULL,"
+    "feature_child_alias TEXT NOT NULL,"
+    ""
+    "PRIMARY KEY (feature_alias, id_feature),"
+    ""
+    "CONSTRAINT length_alias CHECK(LENGTH(feature_child_alias)),"
+    ""
+    "CONSTRAINT fk_FeatureIDs_feature "
+    "FOREIGN KEY (id_feature_child) "
+    "REFERENCES GenomicFeatureChildren (id_feature_child) "
+    "ON DELETE CASCADE"
+    ")",
 };
 
 inline static QStringList Sequences{
